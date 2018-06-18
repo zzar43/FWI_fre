@@ -2,8 +2,8 @@
 function make_diff_operator(h,omega,vel,beta,Nx,Ny)
     coef = (1 + im*beta) .* (h^2*omega.^2) ./ (vel.^2);
     coef = coef - 4;
-    A = spzeros(Complex128, (Nx-2)*(Ny-2), (Nx-2)*(Ny-2));
-    # A = spzeros(Complex64, (Nx-2)*(Ny-2), (Nx-2)*(Ny-2));
+    # A = spzeros(Complex128, (Nx-2)*(Ny-2), (Nx-2)*(Ny-2));
+    A = spzeros(Complex64, (Nx-2)*(Ny-2), (Nx-2)*(Ny-2));
     # A = zeros((Nx-2)*(Ny-2),(Nx-2)*(Ny-2));
     # Center area
     for i = 2:Nx-3
