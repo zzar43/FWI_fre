@@ -212,11 +212,10 @@ function scalar_helmholtz_solver_parallel(vel, source_multi, acq_fre, fre_range)
     # Source term
     source_vec = change_source(source_multi, acq_fre);
 
-    print("    Frequency: ");
-    for ind_fre in fre_range
+    @sync @parallel for ind_fre in fre_range
         A = make_diff_operator(h,omega[ind_fre],vel_ex,beta,Nx_pml,Ny_pml);
         F = lufact(A);
-        @sync @parallel for ind_source = 1:source_num
+        for ind_source = 1:source_num
             source = source_vec[:,ind_fre,ind_source];
             # u_vec = A\source;
             u_vec = F\source;
@@ -226,9 +225,8 @@ function scalar_helmholtz_solver_parallel(vel, source_multi, acq_fre, fre_range)
             wavefield[:,ind_fre,ind_source] = u;
             recorded_data[:,ind_fre,ind_source] = acq_fre.projection_op * u;
         end
-        print(frequency[ind_fre], " Hz ")
+        println("Frequency: ", frequency[ind_fre], " Hz complete.")
     end
-    println("complete.")
 
     return wavefield, recorded_data
 end
