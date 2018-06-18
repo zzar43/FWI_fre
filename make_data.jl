@@ -1,8 +1,7 @@
-@everywhere include("model_parameter.jl");
+include("model_parameter.jl");
 @everywhere include("scalar_helmholtz_solver.jl");
 @everywhere include("FWI_fre.jl");
-@everywhere using JLD2, PyPlot;
-
+using JLD2, PyPlot;
 
 @time wavefield_true, recorded_data_true = scalar_helmholtz_solver_parallel(vel_true, source_multi, acq_fre, "all");
 

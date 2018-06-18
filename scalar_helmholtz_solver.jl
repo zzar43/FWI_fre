@@ -205,8 +205,8 @@ function scalar_helmholtz_solver_parallel(vel, source_multi, acq_fre, fre_range)
     println("Computing helmholtz equation with frequency range: ", frequency[fre_range]);
 
     # Initialize
-    wavefield = ShareArray{Complex64}(Nx*Ny,fre_num,source_num);
-    recorded_data = ShareArray{Complex64}(Nx*Ny,fre_num,source_num);
+    wavefield = SharedArray{Complex64}(Nx*Ny,fre_num,source_num);
+    recorded_data = SharedArray{Complex64}(Nx*Ny,fre_num,source_num);
     # Extend area
     beta, vel_ex = extend_area(vel, acq_fre);
     # Source term
