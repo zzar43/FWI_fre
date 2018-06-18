@@ -9,4 +9,4 @@ using JLD2, PyPlot;
 
 @save "data_compute/three_layers_data.jld2" wavefield_true recorded_data_true
 
-matshow(real(reshape(wavefield_true[:,8,8],Nx,Ny)'), cmap="seismic", clim=[-2,2]); colorbar(); savefig("wavefield.png")
+matshow(real(reshape(wavefield_true[:,1,2],Nx,Ny)'), cmap="seismic", clim=[-2,2]); colorbar(); savefig("wavefield.png")
