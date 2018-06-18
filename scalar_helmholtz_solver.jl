@@ -186,6 +186,53 @@ function scalar_helmholtz_solver(vel, source_multi, acq_fre, fre_range)
     return wavefield, recorded_data
 end
 
+function scalar_helmholtz_solver_parallel(vel, source_multi, acq_fre, fre_range)
+    # This is the fundamental solver
+    # Both vel and source are matrix form with size Nx*Ny
+    Nx_pml = acq_fre.Nx_pml;
+    Ny_pml = acq_fre.Ny_pml;
+    pml_len = acq_fre.pml_len;
+    Nx = acq_fre.Nx;
+    Ny = acq_fre.Ny;
+    frequency = acq_fre.frequency;
+    omega = frequency * 2 * pi;
+    fre_num = acq_fre.fre_num;
+    source_num = acq_fre.source_num;
+
+    if fre_range == "all"
+        fre_range = 1:fre_num
+    end
+    println("Computing helmholtz equation with frequency range: ", frequency[fre_range]);
+
+    # Initialize
+    wavefield = ShareArray{Complex64}(Nx*Ny,fre_num,source_num);
+    recorded_data = ShareArray{Complex64}(Nx*Ny,fre_num,source_num);
+    # Extend area
+    beta, vel_ex = extend_area(vel, acq_fre);
+    # Source term
+    source_vec = change_source(source_multi, acq_fre);
+
+    print("    Frequency: ");
+    for ind_fre in fre_range
+        A = make_diff_operator(h,omega[ind_fre],vel_ex,beta,Nx_pml,Ny_pml);
+        F = lufact(A);
+        @sync @parallel for ind_source = 1:source_num
+            source = source_vec[:,ind_fre,ind_source];
+            # u_vec = A\source;
+            u_vec = F\source;
+            u = reshape(u_vec,Nx_pml-2,Ny_pml-2);
+            u = u[pml_len:pml_len-1+Nx,pml_len:pml_len-1+Ny];
+            u = reshape(u, Nx*Ny, 1);
+            wavefield[:,ind_fre,ind_source] = u;
+            recorded_data[:,ind_fre,ind_source] = acq_fre.projection_op * u;
+        end
+        print(frequency[ind_fre], " Hz ")
+    end
+    println("complete.")
+
+    return wavefield, recorded_data
+end
+
 # This is a pml version. Just for fun.
 # function acoustic_helmholtz_solver_pml(vel,Nx,Ny,omega,h,source_vec,pml_len,pml_alpha,return_vec=true)
 #     Nx0 = Nx + 2pml_len;
