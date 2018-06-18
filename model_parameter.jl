@@ -100,8 +100,8 @@ end
 
 # ===================================================
 # Space
-# @load "data/three_layers.jld2" vel_true vel_init Nx Ny h
-@load "data/marmousi.jld2" vel_true vel_init Nx Ny h
+@load "data/three_layers.jld2" vel_true vel_init Nx Ny h
+# @load "data/marmousi.jld2" vel_true vel_init Nx Ny h
 
 # PML
 pml_len = 50;
@@ -116,29 +116,25 @@ dt = 1/sample_fre;
 Nt = 1000;
 t = linspace(0,(Nt-1)*dt,Nt);
 fre = sample_fre * linspace(0,1-1/Nt,Nt);
-fre_position = 10:10;
+fre_position = 3:2:20;
 frequency = fre[fre_position];
 fre_num = length(frequency);
 println("Frequency: ", frequency)
 
 # ===================================================
 # Source
-source_num = 1;
+source_num = 12;
 source_coor = zeros(Int,source_num,2);
-for i = 1:source_num
-    source_coor[i,1] = 501;
+for i = 1:6
+    source_coor[i,1] = 1+ 20*(i-1);
     source_coor[i,2] = 1;
 end
-# for i = 7:12
-#     source_coor[i,1] = 1 + 20*(i-7);
-#     source_coor[i,2] = 101;
-# end
+for i = 7:12
+    source_coor[i,1] = 1 + 20*(i-7);
+    source_coor[i,2] = 101;
+end
 println("Source number: ", source_num)
 source_multi = build_source_multi(15,0.1,t,fre_position,source_num,fre_num,true);
-source_vec = zeros(Nx,Ny);
-source_vec[20,20] = 1;
-source_vec = reshape(source_vec,Nx*Ny,1);
-
 # ===================================================
 # Receiver
 receiver_num = Nx;
