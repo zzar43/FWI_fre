@@ -124,17 +124,17 @@ dt = 1/sample_fre;
 Nt = 1000;
 t = linspace(0,(Nt-1)*dt,Nt);
 fre = sample_fre * linspace(0,1-1/Nt,Nt);
-fre_position = 11:11;
+fre_position = 2:2:18;
 frequency = fre[fre_position];
 fre_num = length(frequency);
 println("Frequency: ", frequency)
 
 # ===================================================
 # Source
-source_num = 1;
+source_num = 19;
 source_coor = zeros(Int,source_num,2);
 for i = 1:source_num
-    source_coor[i,1] = 500;
+    source_coor[i,1] = 1 + 50*(i-1);
     source_coor[i,2] = 1;
 end
 # for i = 7:12

@@ -11,20 +11,23 @@ using JLD2, PyPlot;
 # ================================================
 
 iter_time = 5;
-c = 1e-5;
+c = 1e-2;
 tau = 0.5;
-search_time = 7;
+search_time = 5;
 misfit_diff_vec = zeros(iter_time);
-alpha0 = 10;
+alpha0 = 100;
 
-fre_range = [1:2,1:2,3:4,3:4,5:6,5:6,7:9,7:9,7:9];
+fre_range = "all"
+for i = 1:length(frequency)-1
+    fre_range = [fre_range; "all"]
+end
+
 for iter_main = 1:iter_time
     println("=======================================")
     println("Main iteration time: ", iter_main)
     # Compute gradient
     @time gradient, misfit_diff = compute_gradient_parallel(vel_init, recorded_data_true, source_multi, acq_fre, fre_range[iter_main]);
-    filename = "gradient_$iter_main.npy";
-    npzwrite(filename, gradient)
+    # filename = "gradient_$iter_main.npy";
     # Compute direction
     p = -gradient./norm(gradient);
     # line search
