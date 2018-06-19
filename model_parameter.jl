@@ -109,7 +109,7 @@ end
 # vel_init = ones(Nx,Ny);
 # h = 0.01;
 # @load "data/three_layers.jld2" vel_true vel_init Nx Ny h
-@load "data/marmousi.jld2" vel_true vel_init Nx Ny h
+# @load "data/marmousi.jld2" vel_true vel_init Nx Ny h
 @load "data/overthrust.jld2" vel_true vel_init Nx Ny h
 
 # PML
