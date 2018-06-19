@@ -111,7 +111,7 @@ function compute_gradient_parallel(vel, recorded_data, source_multi, acq_fre, fr
 
     # Initialize
     gradient = SharedArray{Float32}(Nx*Ny, fre_num, source_num);
-    # recorded_forward = zeros(Complex64,Nx*Ny,fre_num,source_num);
+    recorded_forward = zeros(Complex64,Nx*Ny,fre_num,source_num);
     misfit_diff = 0;
     # Extend area
     beta, vel_ex = extend_area(vel, acq_fre);
@@ -131,7 +131,7 @@ function compute_gradient_parallel(vel, recorded_data, source_multi, acq_fre, fr
             u_forward = u_forward[pml_len:pml_len-1+Nx,pml_len:pml_len-1+Ny];
             # Adjoint source
             r_forward_vec = acq_fre.projection_op * reshape(u_forward,Nx*Ny,1);
-            # recorded_forward[:,ind_fre,ind_source] = r_forward_vec;
+            recorded_forward[:,ind_fre,ind_source] = r_forward_vec;
             source_adjoint = conj(r_forward_vec - recorded_data[:,ind_fre,ind_source]);
             source_adjoint0 = zeros(Complex64,Nx_pml-2,Ny_pml-2);
             source_adjoint0[pml_len:pml_len-1+Nx,pml_len:pml_len-1+Ny] = reshape(source_adjoint,Nx,Ny);
