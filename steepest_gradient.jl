@@ -1,17 +1,16 @@
 # addprocs(2)
 
-# include("model_parameter.jl");
+include("model_parameter.jl");
 @everywhere include("scalar_helmholtz_solver.jl");
 @everywhere include("FWI_fre.jl");
-using JLD2, PyPlot;
+
 
 # ================================================
 # Read recorded data
-@load "data/marmousi_all.jld2" vel_true vel_init acq_fre
 @load "data_compute/marmousi_data.jld2" wavefield_true recorded_data_true
 # ================================================
 
-iter_time = 5;
+iter_time = 1;
 c = 1e-2;
 tau = 0.5;
 search_time = 5;
@@ -19,7 +18,7 @@ misfit_diff_vec = zeros(iter_time);
 alpha0 = 100;
 
 fre_range = "all"
-for i = 1:length(frequency)-1
+for i = 1:length(acq_fre.frequency)-1
     fre_range = [fre_range; "all"]
 end
 
