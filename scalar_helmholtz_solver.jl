@@ -1,5 +1,5 @@
 # This is the file for scalar Helmholtz solver
-function make_diff_operator(h,omega,vel,beta,Nx,Ny)
+function make_diff_operator_old(h,omega,vel,beta,Nx,Ny)
     coef = (1 + im*beta) .* (h^2*omega.^2) ./ (vel.^2);
     coef = coef - 4;
     # A = spzeros(Complex128, (Nx-2)*(Ny-2), (Nx-2)*(Ny-2));
@@ -87,6 +87,24 @@ function make_diff_operator(h,omega,vel,beta,Nx,Ny)
     # A[ind_row,ind_row+Nx-2] = 1;
     return A;
 end;
+
+function make_diff_operator(h,omega,vel_ex,beta,Nx_pml,Ny_pml)
+    coef = (1 + im*beta) .* (h^2*omega.^2) ./ (vel_ex.^2);
+    coef = coef - 4;
+    coef0 = coef[2:end-1,2:end-1];
+    coef0 = reshape(coef0, (Nx_pml-2)*(Ny_pml-2));
+    vec1 = ones((Nx_pml-2)*(Ny_pml-2)-Nx_pml+2);
+    vec2 = ones((Nx_pml-2)*(Ny_pml-2)-1);
+    B = spdiagm((vec1, vec2, coef0, vec2, vec1), (-(Nx_pml-2),-1,0,1,(Nx_pml-2)));
+
+    for i = 1:(Ny_pml-2-1)
+        ind_x = (Nx_pml-2)*i+1;
+        ind_y = (Nx_pml-2)*i;
+        B[ind_x,ind_y] = 0;
+        B[ind_y,ind_x] = 0;
+    end
+    return B
+end
 
 function extend_area(vel, acq_fre)
     # Extend the velocity and build the damping factor

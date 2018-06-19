@@ -101,11 +101,18 @@ end
 
 # ===================================================
 # Space
+# Nx = 230;
+# Ny = 160;
+# vel_true = ones(Nx,Ny);
+# vel_true[:,8:end] = 2;
+# vel_true[:,12:end] = 3;
+# vel_init = ones(Nx,Ny);
+# h = 0.01;
 @load "data/three_layers.jld2" vel_true vel_init Nx Ny h
 # @load "data/marmousi.jld2" vel_true vel_init Nx Ny h
 
 # PML
-pml_len = 50;
+pml_len = 7;
 pml_alpha = 1;
 Nx_pml = Nx + 2pml_len;
 Ny_pml = Ny + 2pml_len;
@@ -124,16 +131,16 @@ println("Frequency: ", frequency)
 
 # ===================================================
 # Source
-source_num = 12;
+source_num = 1;
 source_coor = zeros(Int,source_num,2);
-for i = 1:6
+for i = 1:source_num
     source_coor[i,1] = 1+ 20*(i-1);
     source_coor[i,2] = 1;
 end
-for i = 7:12
-    source_coor[i,1] = 1 + 20*(i-7);
-    source_coor[i,2] = 101;
-end
+# for i = 7:12
+#     source_coor[i,1] = 1 + 20*(i-7);
+#     source_coor[i,2] = 101;
+# end
 println("Source number: ", source_num)
 source_multi = build_source_multi(15,0.1,t,fre_position,source_num,fre_num,true);
 # ===================================================
