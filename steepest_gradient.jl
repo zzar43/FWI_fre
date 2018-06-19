@@ -1,4 +1,4 @@
-addprocs(2)
+# addprocs(2)
 
 include("model_parameter.jl");
 @everywhere include("scalar_helmholtz_solver.jl");
@@ -7,7 +7,7 @@ using JLD2, PyPlot;
 
 # ================================================
 # Read recorded data
-@load "data_compute/three_layers_data.jld2" wavefield_true recorded_data_true
+@load "data_compute/marmousi_data.jld2" wavefield_true recorded_data_true
 # ================================================
 
 iter_time = 5;
@@ -36,5 +36,5 @@ for iter_main = 1:iter_time
     vel_init = vel_init + alpha * p;
 end
 
-matshow(real(vel_init'), clim=[2,3]); colorbar()
-matshow(real(vel_true'), clim=[2,3]); colorbar()
+# matshow(real(vel_init'), clim=[2,3]); colorbar()
+# matshow(real(vel_true'), clim=[2,3]); colorbar()

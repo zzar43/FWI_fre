@@ -111,7 +111,7 @@ function compute_gradient_parallel(vel, recorded_data, source_multi, acq_fre, fr
 
     # Initialize
     gradient = SharedArray{Float32}(Nx*Ny, fre_num, source_num);
-    recorded_forward = zeros(Complex64,Nx*Ny,fre_num,source_num);
+    recorded_forward = SharedArray{Complex64}(Nx*Ny,fre_num,source_num);
     misfit_diff = 0;
     # Extend area
     beta, vel_ex = extend_area(vel, acq_fre);
@@ -146,13 +146,18 @@ function compute_gradient_parallel(vel, recorded_data, source_multi, acq_fre, fr
             gradient[:,ind_fre,ind_source] = reshape(grad, Nx*Ny, 1);
 
             # Misfit difference
-            misfit_diff += 0.5*norm(recorded_forward[:,ind_fre,ind_source]-recorded_data[:,ind_fre,ind_source])^2;
+            # misfit_diff += 0.5*norm(recorded_forward[:,ind_fre,ind_source]-recorded_data[:,ind_fre,ind_source])^2;
         end
         println("Frequency: ", frequency[ind_fre], " Hz complete.")
     end
     gradient = sum(gradient,3);
     gradient = sum(gradient,2);
     gradient = reshape(gradient,Nx,Ny);
+    for ind_fre = 1:fre_num
+        for ind_source = 1:source_num
+            misfit_diff += 0.5*norm(recorded_forward[:,ind_fre,ind_source]-recorded_data[:,ind_fre,ind_source])^2;
+        end
+    end
     return gradient, misfit_diff
 end
 
