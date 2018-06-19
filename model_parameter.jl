@@ -150,7 +150,7 @@ receiver_num = Nx;
 receiver_coor = zeros(Int,receiver_num,2);
 for i = 1:receiver_num
     receiver_coor[i,1] = i;
-    receiver_coor[i,2] = 1;
+    receiver_coor[i,2] = 40;
 end
 println("Receiver number: ", receiver_num)
 # Projection operator

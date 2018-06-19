@@ -9,4 +9,4 @@ using JLD2, PyPlot;
 
 @save "data_compute/marmousi_data.jld2" wavefield_true recorded_data_true
 
-matshow(real(reshape(wavefield_true[:,3,3],Nx,Ny)'), cmap="seismic", clim=[-2,2]); colorbar(); savefig("wavefield.png")
+matshow(real(reshape(wavefield_true[:,8,1],Nx,Ny)'), cmap="seismic", clim=[-0.1,0.1]); colorbar(); savefig("wavefield.png")
