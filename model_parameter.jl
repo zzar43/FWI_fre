@@ -161,3 +161,5 @@ R_pml = build_proj_op_pml(Nx,Ny,receiver_coor,receiver_num,pml_len);
 
 # Make acquisition
 acq_fre = acquisition_fre(Nx,Ny,h,Nt,dt,t,frequency,fre_num,source_num,source_coor,receiver_num,receiver_coor,R,R_pml,pml_len,pml_alpha,Nx_pml,Ny_pml);
+
+@save "data/marmousi.jld2" vel_true vel_init Nx Ny h acq_fre

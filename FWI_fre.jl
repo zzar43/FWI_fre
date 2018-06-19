@@ -131,15 +131,15 @@ function compute_gradient_parallel(vel, recorded_data, source_multi, acq_fre, fr
             u_forward_vec = F\source;
             u_forward = reshape(u_forward_vec,Nx_pml-2,Ny_pml-2);
             u_forward = u_forward[pml_len:pml_len-1+Nx,pml_len:pml_len-1+Ny];
-            #
-            # # Adjoint source
-            # r_forward_vec = acq_fre.projection_op * reshape(u_forward,Nx*Ny,1);
-            # recorded_forward[:,ind_fre,ind_source] = r_forward_vec;
-            # source_adjoint = conj(r_forward_vec - recorded_data[:,ind_fre,ind_source]);
-            # source_adjoint0 = zeros(Complex64,Nx_pml-2,Ny_pml-2);
-            # source_adjoint0[pml_len:pml_len-1+Nx,pml_len:pml_len-1+Ny] = reshape(source_adjoint,Nx,Ny);
-            # source_adjoint = reshape(source_adjoint0, (Nx_pml-2)*(Ny_pml-2), 1);
-            # source_adjoint = -source_adjoint;
+            
+            # Adjoint source
+            r_forward_vec = acq_fre.projection_op * reshape(u_forward,Nx*Ny,1);
+            recorded_forward[:,ind_fre,ind_source] = r_forward_vec;
+            source_adjoint = conj(r_forward_vec - recorded_data[:,ind_fre,ind_source]);
+            source_adjoint0 = zeros(Complex64,Nx_pml-2,Ny_pml-2);
+            source_adjoint0[pml_len:pml_len-1+Nx,pml_len:pml_len-1+Ny] = reshape(source_adjoint,Nx,Ny);
+            source_adjoint = reshape(source_adjoint0, (Nx_pml-2)*(Ny_pml-2), 1);
+            source_adjoint = -source_adjoint;
             #
             # # Backward
             # u_back_vec = F\source_adjoint;
