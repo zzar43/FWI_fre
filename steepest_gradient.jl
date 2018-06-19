@@ -1,12 +1,13 @@
 # addprocs(2)
 
-include("model_parameter.jl");
+# include("model_parameter.jl");
 @everywhere include("scalar_helmholtz_solver.jl");
 @everywhere include("FWI_fre.jl");
 using JLD2, PyPlot;
 
 # ================================================
 # Read recorded data
+@load "data/marmousi_all.jld2" vel_true vel_init acq_fre
 @load "data_compute/marmousi_data.jld2" wavefield_true recorded_data_true
 # ================================================
 
