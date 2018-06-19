@@ -127,10 +127,10 @@ function compute_gradient_parallel(vel, recorded_data, source_multi, acq_fre, fr
 
             source = source_vec[:,ind_fre,ind_source];
 
-            # # Forward
-            # u_forward_vec = F\source;
-            # u_forward = reshape(u_forward_vec,Nx_pml-2,Ny_pml-2);
-            # u_forward = u_forward[pml_len:pml_len-1+Nx,pml_len:pml_len-1+Ny];
+            # Forward
+            u_forward_vec = F\source;
+            u_forward = reshape(u_forward_vec,Nx_pml-2,Ny_pml-2);
+            u_forward = u_forward[pml_len:pml_len-1+Nx,pml_len:pml_len-1+Ny];
             #
             # # Adjoint source
             # r_forward_vec = acq_fre.projection_op * reshape(u_forward,Nx*Ny,1);
