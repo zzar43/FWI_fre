@@ -131,16 +131,17 @@ println("Frequency: ", frequency)
 
 # ===================================================
 # Source
-source_num = 19;
+source_num = 1;
 source_coor = zeros(Int,source_num,2);
+# for i = 1:source_num
+#     source_coor[i,1] = 1 + 50*(i-1);
+#     source_coor[i,2] = 1;
+# end
 for i = 1:source_num
-    source_coor[i,1] = 1 + 50*(i-1);
+    source_coor[i,1] = 500;
     source_coor[i,2] = 1;
 end
-# for i = 7:12
-#     source_coor[i,1] = 1 + 20*(i-7);
-#     source_coor[i,2] = 101;
-# end
+
 println("Source number: ", source_num)
 source_multi = build_source_multi(15,0.1,t,fre_position,source_num,fre_num,true);
 # ===================================================

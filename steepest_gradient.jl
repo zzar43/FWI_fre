@@ -38,3 +38,4 @@ end
 
 # matshow(real(vel_init'), clim=[2,3]); colorbar()
 # matshow(real(vel_true'), clim=[2,3]); colorbar()
+matshow((vel_init+100*p)', cmap="seismic"); colorbar(); savefig("gradient.png")
