@@ -1,31 +1,31 @@
 include("scalar_helmholtz_solver.jl")
 
-struct acquisition_fre
-    # space and frequency
-    Nx::Int64
-    Ny::Int64
-    h::Float32
-    # time
-    Nt::Int64
-    dt
-    t
-    # frequency
-    frequency::Array{Float32}
-    fre_num::Int64
-    # source
-    source_num::Int64
-    source_coor
-    # receiver
-    receiver_num::Int64
-    receiver_coor
-    projection_op
-    projection_op_pml
-    # PML
-    pml_len::Int64
-    pml_alpha::Float32
-    Nx_pml::Int64
-    Ny_pml::Int64
-end
+# struct acquisition_fre
+#     # space and frequency
+#     Nx::Int64
+#     Ny::Int64
+#     h::Float32
+#     # time
+#     Nt::Int64
+#     dt
+#     t
+#     # frequency
+#     frequency::Array{Float32}
+#     fre_num::Int64
+#     # source
+#     source_num::Int64
+#     source_coor
+#     # receiver
+#     receiver_num::Int64
+#     receiver_coor
+#     projection_op
+#     projection_op_pml
+#     # PML
+#     pml_len::Int64
+#     pml_alpha::Float32
+#     Nx_pml::Int64
+#     Ny_pml::Int64
+# end
 
 # Compute gradient by adjoint method.
 function compute_gradient(vel, recorded_data, source_multi, acq_fre, fre_range)
@@ -288,9 +288,9 @@ function backtracking_line_search_parallel(vel,p,gradient,alpha0,misfit_diff0,ta
         println("Alpha: ", alpha, " iter time: ", iter);
         println("misfit_diff0: ", misfit_diff0, " misfit_diff_new: ", misfit_diff_new, " difference: ", misfit_diff0-misfit_diff_new, " αt: ", alpha * t);
     end
-    # if (misfit_diff0 - misfit_diff_new) < alpha * t
-    #     alpha = 0;
-    # end
+    if misfit_diff0 < misfit_diff_new
+        alpha = 0;
+    end
     return alpha
 end
 

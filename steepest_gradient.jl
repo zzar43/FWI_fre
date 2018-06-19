@@ -14,7 +14,7 @@ matshow((vel_init)', cmap="seismic"); colorbar();
 @load "data_compute/three_layers.jld2" wavefield_true recorded_data_true
 # ================================================
 
-c = 1e-6;
+c = 1e-4;
 tau = 0.5;
 search_time = 5;
 alpha0 = 10;
@@ -26,7 +26,7 @@ misfit_diff_vec = [0];
 
 iter_main = 1;
 alpha = 0;
-while (iter_main != length(acq_fre.frequency)) || (alpha != alpha0*tau^(search_time-1))
+while (iter_main != length(acq_fre.frequency)) || (alpha != 0)
     println("=======================================")
     println("Main iteration time: ", iter_main, " frequency: ", acq_fre.frequency[iter_main], " alpha: ", alpha);
 
@@ -46,7 +46,8 @@ while (iter_main != length(acq_fre.frequency)) || (alpha != alpha0*tau^(search_t
     alpha = backtracking_line_search_parallel(vel_init,p,gradient,alpha0,misfit_diff,tau,c,search_time,"all",recorded_data_true,acq_fre,vmin,vmax);
 
     # update velocity
-    if alpha == alpha0*tau^(search_time-1)
+    # if alpha == alpha0*tau^(search_time-1)
+    if alpha == 0
         iter_main += 1;
         # save graph
         matshow((vel_init)', cmap="seismic"); colorbar();savefig("temp_graph/vel_$iter_main.png")
