@@ -110,6 +110,7 @@ end
 # h = 0.01;
 # @load "data/three_layers.jld2" vel_true vel_init Nx Ny h
 @load "data/marmousi.jld2" vel_true vel_init Nx Ny h
+@load "data/overthrust.jld2" vel_true vel_init Nx Ny h
 
 # PML
 pml_len = 50;
@@ -138,7 +139,7 @@ source_coor = zeros(Int,source_num,2);
 #     source_coor[i,2] = 1;
 # end
 for i = 1:source_num
-    source_coor[i,1] = 500;
+    source_coor[i,1] = 400;
     source_coor[i,2] = 1;
 end
 
@@ -150,7 +151,7 @@ receiver_num = Nx;
 receiver_coor = zeros(Int,receiver_num,2);
 for i = 1:receiver_num
     receiver_coor[i,1] = i;
-    receiver_coor[i,2] = 40;
+    receiver_coor[i,2] = 1;
 end
 println("Receiver number: ", receiver_num)
 # Projection operator
