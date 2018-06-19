@@ -158,7 +158,7 @@ function compute_gradient_parallel(vel, recorded_data, source_multi, acq_fre, fr
     gradient = sum(gradient,3);
     gradient = sum(gradient,2);
     gradient = reshape(gradient,Nx,Ny);
-    for ind_fre = 1:fre_num
+    for ind_fre in fre_range
         for ind_source = 1:source_num
             misfit_diff += 0.5*norm(recorded_forward[:,ind_fre,ind_source]-recorded_data[:,ind_fre,ind_source])^2;
         end
@@ -166,7 +166,16 @@ function compute_gradient_parallel(vel, recorded_data, source_multi, acq_fre, fr
     return gradient, misfit_diff
 end
 
-function backtracking_line_search(vel,p,gradient,alpha0,misfit_diff0,tau,c,iter_time,fre_range,recorded_data_true)
+function backtracking_line_search(vel,p,gradient,alpha0,misfit_diff0,tau,c,iter_time,fre_range,recorded_data_true,acq_fre,vmin,vmax)
+    Nx_pml = acq_fre.Nx_pml;
+    Ny_pml = acq_fre.Ny_pml;
+    pml_len = acq_fre.pml_len;
+    Nx = acq_fre.Nx;
+    Ny = acq_fre.Ny;
+    frequency = acq_fre.frequency;
+    omega = frequency * 2 * pi;
+    fre_num = acq_fre.fre_num;
+    source_num = acq_fre.source_num;
     if fre_range == "all"
         fre_range = 1:fre_num
     end
@@ -175,7 +184,7 @@ function backtracking_line_search(vel,p,gradient,alpha0,misfit_diff0,tau,c,iter_
     m = sum(p.*gradient);
     t = -c*m;
     println(misfit_diff0," ", alpha0*t)
-    if misfit_diff0 < alpha0*t
+    if misfit_diff0 < 4*alpha0*t
         error("c is too large");
     end
     iter = 1;
@@ -183,6 +192,8 @@ function backtracking_line_search(vel,p,gradient,alpha0,misfit_diff0,tau,c,iter_
     alpha = alpha0;
 
     vel_new = vel + alpha * p;
+    vel_new[find(x->(x<vmin),vel_new)] = vmin;
+    vel_new[find(x->(x>vmax),vel_new)] = vmax;
     wavefield, recorded_forward = scalar_helmholtz_solver(vel_new, source_multi, acq_fre, fre_range);
     misfit_diff_new = 0;
     for ind_fre in fre_range
@@ -197,6 +208,8 @@ function backtracking_line_search(vel,p,gradient,alpha0,misfit_diff0,tau,c,iter_
         iter += 1;
         alpha = tau * alpha;
         vel_new = vel + alpha * p;
+        vel_new[find(x->(x<vmin),vel_new)] = vmin;
+        vel_new[find(x->(x>vmax),vel_new)] = vmax;
         wavefield, recorded_forward = scalar_helmholtz_solver(vel_new, source_multi, acq_fre, fre_range);
         misfit_diff_new = 0;
         for ind_fre in fre_range
@@ -210,7 +223,16 @@ function backtracking_line_search(vel,p,gradient,alpha0,misfit_diff0,tau,c,iter_
     return alpha
 end
 
-function backtracking_line_search_parallel(vel,p,gradient,alpha0,misfit_diff0,tau,c,iter_time,fre_range,recorded_data_true)
+function backtracking_line_search_parallel(vel,p,gradient,alpha0,misfit_diff0,tau,c,iter_time,fre_range,recorded_data_true,acq_fre,vmin,vmax)
+    Nx_pml = acq_fre.Nx_pml;
+    Ny_pml = acq_fre.Ny_pml;
+    pml_len = acq_fre.pml_len;
+    Nx = acq_fre.Nx;
+    Ny = acq_fre.Ny;
+    frequency = acq_fre.frequency;
+    omega = frequency * 2 * pi;
+    fre_num = acq_fre.fre_num;
+    source_num = acq_fre.source_num;
     if fre_range == "all"
         fre_range = 1:fre_num
     end
@@ -218,15 +240,28 @@ function backtracking_line_search_parallel(vel,p,gradient,alpha0,misfit_diff0,ta
 
     m = sum(p.*gradient);
     t = -c*m;
+
+    # Compute misfit function at vel_init
+    wavefield, recorded_forward = scalar_helmholtz_solver_parallel(vel, source_multi, acq_fre, fre_range);
+    misfit_diff0 = 0;
+    for ind_fre in fre_range
+        for ind_source = 1:source_num
+            misfit_diff0 += 0.5*norm(recorded_forward[:,ind_fre,ind_source]-recorded_data_true[:,ind_fre,ind_source])^2;
+        end
+    end
     println(misfit_diff0," ", alpha0*t)
-    if misfit_diff0 < alpha0*t
+    # for safe
+    if misfit_diff0 < 4*alpha0*t
         error("c is too large");
     end
+    # Initialize
     iter = 1;
     misfit_diff_new = 0;
     alpha = alpha0;
 
     vel_new = vel + alpha * p;
+    vel_new[find(x->(x<vmin),vel_new)] = vmin;
+    vel_new[find(x->(x>vmax),vel_new)] = vmax;
     wavefield, recorded_forward = scalar_helmholtz_solver_parallel(vel_new, source_multi, acq_fre, fre_range);
     misfit_diff_new = 0;
     for ind_fre in fre_range
@@ -241,6 +276,8 @@ function backtracking_line_search_parallel(vel,p,gradient,alpha0,misfit_diff0,ta
         iter += 1;
         alpha = tau * alpha;
         vel_new = vel + alpha * p;
+        vel_new[find(x->(x<vmin),vel_new)] = vmin;
+        vel_new[find(x->(x>vmax),vel_new)] = vmax;
         wavefield, recorded_forward = scalar_helmholtz_solver_parallel(vel_new, source_multi, acq_fre, fre_range);
         misfit_diff_new = 0;
         for ind_fre in fre_range
@@ -251,5 +288,66 @@ function backtracking_line_search_parallel(vel,p,gradient,alpha0,misfit_diff0,ta
         println("Alpha: ", alpha, " iter time: ", iter);
         println("misfit_diff0: ", misfit_diff0, " misfit_diff_new: ", misfit_diff_new, " difference: ", misfit_diff0-misfit_diff_new, " αt: ", alpha * t);
     end
+    # if (misfit_diff0 - misfit_diff_new) < alpha * t
+    #     alpha = 0;
+    # end
     return alpha
 end
+
+
+# function backtracking_line_search_parallel(vel,p,gradient,alpha0,misfit_diff0,tau,c,iter_time,fre_range,recorded_data_true,acq_fre,vmin,vmax)
+#     Nx_pml = acq_fre.Nx_pml;
+#     Ny_pml = acq_fre.Ny_pml;
+#     pml_len = acq_fre.pml_len;
+#     Nx = acq_fre.Nx;
+#     Ny = acq_fre.Ny;
+#     frequency = acq_fre.frequency;
+#     omega = frequency * 2 * pi;
+#     fre_num = acq_fre.fre_num;
+#     source_num = acq_fre.source_num;
+#     if fre_range == "all"
+#         fre_range = 1:fre_num
+#     end
+#     println("Backtracking line search frequency range: ", frequency[fre_range]);
+#
+#     m = sum(p.*gradient);
+#     t = -c*m;
+#     println(misfit_diff0," ", alpha0*t)
+#     if misfit_diff0 < 4*alpha0*t
+#         error("c is too large");
+#     end
+#     iter = 1;
+#     misfit_diff_new = 0;
+#     alpha = alpha0;
+#
+#     vel_new = vel + alpha * p;
+#     vel_new[find(x->(x<vmin),vel_new)] = vmin;
+#     vel_new[find(x->(x>vmax),vel_new)] = vmax;
+#     wavefield, recorded_forward = scalar_helmholtz_solver_parallel(vel_new, source_multi, acq_fre, fre_range);
+#     misfit_diff_new = 0;
+#     for ind_fre in fre_range
+#         for ind_source = 1:source_num
+#             misfit_diff_new += 0.5*norm(recorded_forward[:,ind_fre,ind_source]-recorded_data_true[:,ind_fre,ind_source])^2;
+#         end
+#     end
+#     println("Alpha: ", alpha, " iter time: ", iter);
+#     println("misfit_diff0: ", misfit_diff0, " misfit_diff_new: ", misfit_diff_new, " difference: ", misfit_diff0-misfit_diff_new, " αt: ", alpha * t);
+#
+#     while (iter < iter_time) && ((misfit_diff0 - misfit_diff_new) < alpha * t)
+#         iter += 1;
+#         alpha = tau * alpha;
+#         vel_new = vel + alpha * p;
+#         vel_new[find(x->(x<vmin),vel_new)] = vmin;
+#         vel_new[find(x->(x>vmax),vel_new)] = vmax;
+#         wavefield, recorded_forward = scalar_helmholtz_solver_parallel(vel_new, source_multi, acq_fre, fre_range);
+#         misfit_diff_new = 0;
+#         for ind_fre in fre_range
+#             for ind_source = 1:source_num
+#                 misfit_diff_new += 0.5*norm(recorded_forward[:,ind_fre,ind_source]-recorded_data_true[:,ind_fre,ind_source])^2;
+#             end
+#         end
+#         println("Alpha: ", alpha, " iter time: ", iter);
+#         println("misfit_diff0: ", misfit_diff0, " misfit_diff_new: ", misfit_diff_new, " difference: ", misfit_diff0-misfit_diff_new, " αt: ", alpha * t);
+#     end
+#     return alpha
+# end

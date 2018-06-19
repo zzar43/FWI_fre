@@ -142,6 +142,7 @@ function change_source(source_multi, acq_fre)
     Ny_pml = acq_fre.Ny_pml;
     fre_num = acq_fre.fre_num;
     source_num = acq_fre.source_num;
+    pml_len = acq_fre.pml_len;
 
     # Source term
     source_vec = zeros(Complex64, (Nx_pml-2)*(Ny_pml-2), fre_num, source_num);
