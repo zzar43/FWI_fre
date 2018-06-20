@@ -1,93 +1,20 @@
-# This is the file for scalar Helmholtz solver
-function make_diff_operator_old(h,omega,vel,beta,Nx,Ny)
-    coef = (1 + im*beta) .* (h^2*omega.^2) ./ (vel.^2);
-    coef = coef - 4;
-    # A = spzeros(Complex128, (Nx-2)*(Ny-2), (Nx-2)*(Ny-2));
-    A = spzeros(Complex64, (Nx-2)*(Ny-2), (Nx-2)*(Ny-2));
-    # A = zeros((Nx-2)*(Ny-2),(Nx-2)*(Ny-2));
-    # Center area
-    for i = 2:Nx-3
-        for j = 2:Ny-3
-            ind_row = (j-1)*(Nx-2)+i;
-            A[ind_row,ind_row] = coef[i+1,j+1];
-            A[ind_row,ind_row-1] = 1;
-            A[ind_row,ind_row+1] = 1;
-            A[ind_row,ind_row-Nx+2] = 1;
-            A[ind_row,ind_row+Nx-2] = 1;
-        end
-    end
-    # Top
-    i = 1;
-    for j = 2:Ny-3
-        ind_row = (j-1)*(Nx-2)+i;
-        A[ind_row,ind_row] = coef[i+1,j+1];
-        # A[ind_row,ind_row-1] = 1;
-        A[ind_row,ind_row+1] = 1;
-        A[ind_row,ind_row-Nx+2] = 1;
-        A[ind_row,ind_row+Nx-2] = 1;
-    end
-    # Bottom
-    i = Nx-2;
-    for j = 2:Ny-3
-        ind_row = (j-1)*(Nx-2)+i;
-        A[ind_row,ind_row] = coef[i+1,j+1];
-        A[ind_row,ind_row-1] = 1;
-        # A[ind_row,ind_row+1] = 1;
-        A[ind_row,ind_row-Nx+2] = 1;
-        A[ind_row,ind_row+Nx-2] = 1;
-    end
-    # Left
-    j = 1;
-    for i = 2:Nx-3
-        ind_row = (j-1)*(Nx-2)+i;
-        A[ind_row,ind_row] = coef[i+1,j+1];
-        A[ind_row,ind_row-1] = 1;
-        A[ind_row,ind_row+1] = 1;
-        # A[ind_row,ind_row-Nx+2] = 1;
-        A[ind_row,ind_row+Nx-2] = 1;
-    end
-    # Right
-    j = Ny-2;
-    for i = 2:Nx-3
-        ind_row = (j-1)*(Nx-2)+i;
-        A[ind_row,ind_row] = coef[i+1,j+1];
-        A[ind_row,ind_row-1] = 1;
-        A[ind_row,ind_row+1] = 1;
-        A[ind_row,ind_row-Nx+2] = 1;
-        # A[ind_row,ind_row+Nx-2] = 1;
-    end
-    # Corner
-    i = 1; j = 1;
-    ind_row = (j-1)*(Nx-2)+i;
-    A[ind_row,ind_row] = coef[i+1,j+1];
-    # A[ind_row,ind_row-1] = 1;
-    A[ind_row,ind_row+1] = 1;
-    # A[ind_row,ind_row-Nx+2] = 1;
-    A[ind_row,ind_row+Nx-2] = 1;
-    i = Nx-2; j = 1;
-    ind_row = (j-1)*(Nx-2)+i;
-    A[ind_row,ind_row] = coef[i+1,j+1];
-    A[ind_row,ind_row-1] = 1;
-    # A[ind_row,ind_row+1] = 1;
-    # A[ind_row,ind_row-Nx+2] = 1;
-    A[ind_row,ind_row+Nx-2] = 1;
-    i = 1; j = Ny-2;
-    ind_row = (j-1)*(Nx-2)+i;
-    A[ind_row,ind_row] = coef[i+1,j+1];
-    # A[ind_row,ind_row-1] = 1;
-    A[ind_row,ind_row+1] = 1;
-    A[ind_row,ind_row-Nx+2] = 1;
-    # A[ind_row,ind_row+Nx-2] = 1;
-    i = Nx-2; j = Ny-2;
-    ind_row = (j-1)*(Nx-2)+i;
-    A[ind_row,ind_row] = coef[i+1,j+1];
-    A[ind_row,ind_row-1] = 1;
-    # A[ind_row,ind_row+1] = 1;
-    A[ind_row,ind_row-Nx+2] = 1;
-    # A[ind_row,ind_row+Nx-2] = 1;
-    return A;
-end;
+# Scalar Helmoholtz equation solver in 2D
+# Author: Li, Da
+# Email: da.li1@ucalgary.ca
+"""
+    scalar_helmholtz_solver_parallel(vel, source_multi, acq_fre, fre_range)
+    scalar_helmholtz_solver(vel, source_multi, acq_fre, fre_range)
 
+    Input:
+    vel: velocity model, should in matrix form with Nx*Ny
+    source_multi: source term, should in matrix form with [Nx,Ny,fre_num,source_num]
+    acq_fre: data structure of all other informations
+    fre_range: frequency range need to be compute. For example: if frequency is [2 Hz, 3 Hz, 5 Hz],
+        fre_range = 1:2 means 2 and 3 Hz be computed
+
+"""
+
+# Construct the differential operator with size (Nx_pml-2)*(Ny_pml-2) by (Nx_pml-2)*(Ny_pml-2)
 function make_diff_operator(h,omega,vel_ex,beta,Nx_pml,Ny_pml)
     coef = (1 + im*beta) .* (h^2*omega.^2) ./ (vel_ex.^2);
     coef = coef - 4;
@@ -106,6 +33,7 @@ function make_diff_operator(h,omega,vel_ex,beta,Nx_pml,Ny_pml)
     return B
 end
 
+# Extend the velocity model from Nx*Ny to Nx_pml*Ny_pml
 function extend_area(vel, acq_fre)
     # Extend the velocity and build the damping factor
     pml_alpha = acq_fre.pml_alpha;
@@ -136,8 +64,8 @@ function extend_area(vel, acq_fre)
     return beta, vel_ex
 end
 
+# Change the source term in the vector form [(Nx_pml-2)*(Ny_pml-2), fre_num, source_num]
 function change_source(source_multi, acq_fre)
-    # Change the source vector dimension to Nx_pml-2 * Ny_pml-2
     Nx_pml = acq_fre.Nx_pml;
     Ny_pml = acq_fre.Ny_pml;
     fre_num = acq_fre.fre_num;
@@ -173,7 +101,7 @@ function scalar_helmholtz_solver(vel, source_multi, acq_fre, fre_range)
     if fre_range == "all"
         fre_range = 1:fre_num
     end
-    println("Computing helmholtz equation with frequency range: ", frequency[fre_range]);
+    # println("Computing helmholtz equation with frequency range: ", frequency[fre_range]);
 
     # Initialize
     wavefield = zeros(Complex64,Nx*Ny,fre_num,source_num);
@@ -183,7 +111,7 @@ function scalar_helmholtz_solver(vel, source_multi, acq_fre, fre_range)
     # Source term
     source_vec = change_source(source_multi, acq_fre);
 
-    print("    Frequency: ");
+    # print("    Frequency: ");
     for ind_fre in fre_range
         A = make_diff_operator(h,omega[ind_fre],vel_ex,beta,Nx_pml,Ny_pml);
         F = lufact(A);
@@ -197,9 +125,9 @@ function scalar_helmholtz_solver(vel, source_multi, acq_fre, fre_range)
             wavefield[:,ind_fre,ind_source] = u;
             recorded_data[:,ind_fre,ind_source] = acq_fre.projection_op * u;
         end
-        print(frequency[ind_fre], " Hz ")
+        # print(frequency[ind_fre], " Hz ")
     end
-    println("complete.")
+    # println("complete.")
 
 
     return wavefield, recorded_data
@@ -250,6 +178,95 @@ function scalar_helmholtz_solver_parallel(vel, source_multi, acq_fre, fre_range)
     return wavefield, recorded_data
 end
 
+# Save the old code
+# function make_diff_operator_old(h,omega,vel,beta,Nx,Ny)
+#     coef = (1 + im*beta) .* (h^2*omega.^2) ./ (vel.^2);
+#     coef = coef - 4;
+#     # A = spzeros(Complex128, (Nx-2)*(Ny-2), (Nx-2)*(Ny-2));
+#     A = spzeros(Complex64, (Nx-2)*(Ny-2), (Nx-2)*(Ny-2));
+#     # A = zeros((Nx-2)*(Ny-2),(Nx-2)*(Ny-2));
+#     # Center area
+#     for i = 2:Nx-3
+#         for j = 2:Ny-3
+#             ind_row = (j-1)*(Nx-2)+i;
+#             A[ind_row,ind_row] = coef[i+1,j+1];
+#             A[ind_row,ind_row-1] = 1;
+#             A[ind_row,ind_row+1] = 1;
+#             A[ind_row,ind_row-Nx+2] = 1;
+#             A[ind_row,ind_row+Nx-2] = 1;
+#         end
+#     end
+#     # Top
+#     i = 1;
+#     for j = 2:Ny-3
+#         ind_row = (j-1)*(Nx-2)+i;
+#         A[ind_row,ind_row] = coef[i+1,j+1];
+#         # A[ind_row,ind_row-1] = 1;
+#         A[ind_row,ind_row+1] = 1;
+#         A[ind_row,ind_row-Nx+2] = 1;
+#         A[ind_row,ind_row+Nx-2] = 1;
+#     end
+#     # Bottom
+#     i = Nx-2;
+#     for j = 2:Ny-3
+#         ind_row = (j-1)*(Nx-2)+i;
+#         A[ind_row,ind_row] = coef[i+1,j+1];
+#         A[ind_row,ind_row-1] = 1;
+#         # A[ind_row,ind_row+1] = 1;
+#         A[ind_row,ind_row-Nx+2] = 1;
+#         A[ind_row,ind_row+Nx-2] = 1;
+#     end
+#     # Left
+#     j = 1;
+#     for i = 2:Nx-3
+#         ind_row = (j-1)*(Nx-2)+i;
+#         A[ind_row,ind_row] = coef[i+1,j+1];
+#         A[ind_row,ind_row-1] = 1;
+#         A[ind_row,ind_row+1] = 1;
+#         # A[ind_row,ind_row-Nx+2] = 1;
+#         A[ind_row,ind_row+Nx-2] = 1;
+#     end
+#     # Right
+#     j = Ny-2;
+#     for i = 2:Nx-3
+#         ind_row = (j-1)*(Nx-2)+i;
+#         A[ind_row,ind_row] = coef[i+1,j+1];
+#         A[ind_row,ind_row-1] = 1;
+#         A[ind_row,ind_row+1] = 1;
+#         A[ind_row,ind_row-Nx+2] = 1;
+#         # A[ind_row,ind_row+Nx-2] = 1;
+#     end
+#     # Corner
+#     i = 1; j = 1;
+#     ind_row = (j-1)*(Nx-2)+i;
+#     A[ind_row,ind_row] = coef[i+1,j+1];
+#     # A[ind_row,ind_row-1] = 1;
+#     A[ind_row,ind_row+1] = 1;
+#     # A[ind_row,ind_row-Nx+2] = 1;
+#     A[ind_row,ind_row+Nx-2] = 1;
+#     i = Nx-2; j = 1;
+#     ind_row = (j-1)*(Nx-2)+i;
+#     A[ind_row,ind_row] = coef[i+1,j+1];
+#     A[ind_row,ind_row-1] = 1;
+#     # A[ind_row,ind_row+1] = 1;
+#     # A[ind_row,ind_row-Nx+2] = 1;
+#     A[ind_row,ind_row+Nx-2] = 1;
+#     i = 1; j = Ny-2;
+#     ind_row = (j-1)*(Nx-2)+i;
+#     A[ind_row,ind_row] = coef[i+1,j+1];
+#     # A[ind_row,ind_row-1] = 1;
+#     A[ind_row,ind_row+1] = 1;
+#     A[ind_row,ind_row-Nx+2] = 1;
+#     # A[ind_row,ind_row+Nx-2] = 1;
+#     i = Nx-2; j = Ny-2;
+#     ind_row = (j-1)*(Nx-2)+i;
+#     A[ind_row,ind_row] = coef[i+1,j+1];
+#     A[ind_row,ind_row-1] = 1;
+#     # A[ind_row,ind_row+1] = 1;
+#     A[ind_row,ind_row-Nx+2] = 1;
+#     # A[ind_row,ind_row+Nx-2] = 1;
+#     return A;
+# end;
 # This is a pml version. Just for fun.
 # function acoustic_helmholtz_solver_pml(vel,Nx,Ny,omega,h,source_vec,pml_len,pml_alpha,return_vec=true)
 #     Nx0 = Nx + 2pml_len;
