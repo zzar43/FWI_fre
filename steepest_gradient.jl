@@ -11,16 +11,16 @@ using JLD2, PyPlot
 
 # ================================================
 # Read data
-@load "data/three_layers.jld2" vel_true vel_init acq_fre;
-@load "data_compute/three_layers.jld2" wavefield_true recorded_data_true;
-matshow((vel_true)', cmap="plasma"); colorbar();
-matshow((vel_init)', cmap="plasma"); colorbar();
+@load "data/marmousi.jld2" vel_true vel_init acq_fre;
+@load "data_compute/marmousi.jld2" wavefield_true recorded_data_true;
+matshow((vel_true)', cmap="plasma"); colorbar(); savefig("temp_graph/vel_true.png")
+matshow((vel_init)', cmap="plasma"); colorbar(); savefig("temp_graph/vel_init.png")
 # ================================================
 
 vmin = minimum(vel_true);
 vmax = maximum(vel_true);
 
-vel_init, misfit_vec = steepest_gradient(vel_init, acq_fre, recorded_data_true, vmin, vmax; alpha0=8, iter_time=3, c=1e-5, tau=0.5, search_time=5, fre_range="all", verbose=true, save_graph=true);
+vel_init, misfit_vec = steepest_gradient(vel_init, acq_fre, recorded_data_true, vmin, vmax; alpha0=100000, iter_time=20, c=1e-5, tau=0.5, search_time=5, fre_range="all", verbose=true, save_graph=true);
 
 #
 # # For three layers
