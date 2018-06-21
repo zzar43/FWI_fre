@@ -2,18 +2,19 @@
 using JLD2, PyPlot;
 # Head function
 include("model_func.jl");
+include("def_structure.jl");
 
 # Space
-# Nx = 230;
-# Ny = 160;
-# vel_true = ones(Nx,Ny);
-# vel_true[:,8:end] = 2;
-# vel_true[:,12:end] = 3;
-# vel_init = ones(Nx,Ny);
-# h = 0.01;
-@load "data/three_layers.jld2" vel_true vel_init Nx Ny h
+# @load "data/three_layers.jld2" vel_true vel_init Nx Ny h
 # @load "data/marmousi.jld2" vel_true vel_init Nx Ny h
 # @load "data/overthrust.jld2" vel_true vel_init Nx Ny h
+
+using MAT;
+vars = matread("marmousi_dz10.mat");
+vel_true = vars["vel"]; vel_true = vel_true.';
+vel_true = convert(Array{Float32,2},vel_true)
+Nx, Ny = size(vel_true);
+h = 10;
 using ImageFiltering
 vel_init = imfilter(vel_true, Kernel.gaussian(15));
 
@@ -67,6 +68,6 @@ R_pml = build_proj_op_pml(Nx,Ny,receiver_coor,receiver_num,pml_len);
 # draw_model(vel_true, vel_init, receiver_coor,source_coor);
 
 # Make acquisition
-acq_fre = acquisition_fre(Nx,Ny,h,Nt,dt,t,frequency,fre_num,source_num,source_coor,receiver_num,receiver_coor,R,R_pml,pml_len,pml_alpha,Nx_pml,Ny_pml);
+acq_fre = acquisition_fre(Nx,Ny,h,Nt,dt,t,frequency,fre_num,source_num,source_coor,source_multi,receiver_num,receiver_coor,R,R_pml,pml_len,pml_alpha,Nx_pml,Ny_pml);
 
-@save "data/three_layers.jld2" vel_true vel_init Nx Ny h source_multi acq_fre
+@save "data/marmousi.jld2" vel_true vel_init acq_fre
