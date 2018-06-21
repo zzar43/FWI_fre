@@ -33,7 +33,7 @@ dt = 1/sample_fre;
 Nt = 1000;
 t = linspace(0,(Nt-1)*dt,Nt);
 fre = sample_fre * linspace(0,1-1/Nt,Nt);
-fre_position = 3:25;
+fre_position = 4:4:20;
 frequency = fre[fre_position];
 fre_num = length(frequency);
 println("Frequency: ", frequency)
