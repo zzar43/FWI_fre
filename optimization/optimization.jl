@@ -52,6 +52,7 @@ function steepest_gradient(vel_init, acq_fre, recorded_data_true, vmin, vmax; al
             title_name = acq_fre.frequency[ind_fre];
             matshow((vel_init)'); colorbar(); title("$title_name Hz")
             savefig("temp_graph/vel_$ind_fre.png");
+            println("Graph saved.")
         end
     end
     misfit_vec = misfit_vec[1:iter_main];

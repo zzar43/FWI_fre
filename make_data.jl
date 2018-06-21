@@ -1,4 +1,4 @@
-addprocs(2)
+# addprocs(10)
 
 # include("model_parameter.jl");
 @everywhere include("scalar_helmholtz_solver.jl");
@@ -11,5 +11,4 @@ using JLD2, PyPlot;
 
 @save "data_compute/marmousi.jld2" wavefield_true recorded_data_true
 
-matshow(real(reshape(wavefield_true[:,1,10],acq_fre.Nx,acq_fre.Ny)'), cmap="seismic"); colorbar();
-savefig("temp_graph/wavefield.png")
+matshow(real(reshape(wavefield_true[:,1,10],acq_fre.Nx,acq_fre.Ny)'), cmap="seismic", clim=[-1,1]); colorbar(); savefig("temp_graph/wavefield.png")

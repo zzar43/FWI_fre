@@ -17,7 +17,8 @@ using JLD2, PyPlot;
 # alpha = 10000;
 # vel_new = update_velocity(vel_init,alpha,p,vmin,vmax);
 # matshow(vel_new', cmap="seismic"); colorbar()
-
-vel_new, misfit_vec = steepest_gradient(vel_init, acq_fre, recorded_data_true, vmin, vmax; alpha0=5000, iter_time=5, c=1e-3, tau=0.4, search_time=5, verbose=true, save_graph=true, single_fre=3);
+vmax = maximum(vel_true);
+vmin = minimum(vel_true);
+vel_new, misfit_vec = steepest_gradient(vel_init, acq_fre, recorded_data_true, vmin, vmax; alpha0=1000, iter_time=5, c=1e-3, tau=0.4, search_time=5, verbose=true, save_graph=true, single_fre=1);
 
 matshow(vel_new', cmap="seismic"); colorbar()
