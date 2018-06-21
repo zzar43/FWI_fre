@@ -17,12 +17,17 @@
 
 """
 
-function steepest_gradient(vel_init, acq_fre, recorded_data_true, vmin, vmax; alpha0=1, iter_time=10, c=1e-5, tau=0.5, search_time=4, verbose=false, save_graph=false)
+function steepest_gradient(vel_init, acq_fre, recorded_data_true, vmin, vmax; alpha0=1, iter_time=10, c=1e-5, tau=0.5, search_time=4, verbose=false, save_graph=false, single_fre=false)
 
     misfit_vec = zeros(Float32, iter_time * acq_fre.fre_num);
 
+    if single_fre == false
+        fre_range1 = 1:1:acq_fre.fre_num
+    else
+        fre_range1 = single_fre:single_fre
+    end
     iter_main = 0;
-    for ind_fre = 1:acq_fre.fre_num
+    for ind_fre in fre_range1
         fre_range = [ind_fre];
         for iter = 1:iter_time
             iter_main += 1

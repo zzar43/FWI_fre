@@ -33,7 +33,7 @@ dt = 1/sample_fre;
 Nt = 1000;
 t = linspace(0,(Nt-1)*dt,Nt);
 fre = sample_fre * linspace(0,1-1/Nt,Nt);
-fre_position = 3:3:18;
+fre_position = 11:11;
 frequency = fre[fre_position];
 fre_num = length(frequency);
 println("Frequency: ", frequency)
@@ -52,7 +52,7 @@ end
 # end
 
 println("Source number: ", source_num)
-source_multi = build_source_multi(10,0.1,t,fre_position,source_num,fre_num,true);
+source_multi = build_source_multi(15,0.1,t,fre_position,source_num,fre_num,true);
 # ===================================================
 # Receiver
 receiver_num = Nx;
