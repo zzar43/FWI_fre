@@ -28,8 +28,8 @@ function backtracking_line_search(vel,acq_fre,p,gradient,recorded_data,vmin,vmax
     end
     if misfit_diff0 < misfit_diff_new
         # Two ways
-        # alpha = 0;
-        alpha = tau * alpha;
+        alpha = 0;
+        # alpha = tau * alpha;
         misfit_diff_new = misfit_diff0;
     end
     if verbose == true
