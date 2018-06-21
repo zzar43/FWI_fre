@@ -2,6 +2,7 @@
 
 # include("model_parameter.jl");
 @everywhere include("scalar_helmholtz_solver.jl");
+@everywhere include("def_structure.jl");
 # @everywhere include("FWI_fre.jl");
 using JLD2, PyPlot;
 @load "data/marmousi.jld2" vel_true vel_init acq_fre
