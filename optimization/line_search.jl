@@ -33,7 +33,7 @@ function backtracking_line_search(vel,acq_fre,p,gradient,recorded_data,vmin,vmax
         misfit_diff_new = misfit_diff0;
     end
     if verbose == true
-        println("Alpha is ", alpha)
+        println("Alpha is ", alpha, " misfit functional: ", misfit_diff_new)
     end
     return alpha, misfit_diff_new
 end

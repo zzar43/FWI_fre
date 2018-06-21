@@ -7,7 +7,6 @@
 
     Input:
     vel: velocity model, should in matrix form with Nx*Ny
-    source_multi: source term, should in matrix form with [Nx,Ny,fre_num,source_num]
     acq_fre: data structure of all other informations
     fre_range: frequency range need to be compute.
         For example: if frequency is [2 Hz, 3 Hz, 5 Hz], fre_range = 1:2 means 2 and 3 Hz be computed.

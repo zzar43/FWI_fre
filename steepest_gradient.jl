@@ -20,9 +20,20 @@ matshow((vel_init)', cmap="plasma"); colorbar(); savefig("temp_graph/vel_init.pn
 vmin = minimum(vel_true);
 vmax = maximum(vel_true);
 
-vel_init, misfit_vec = steepest_gradient(vel_init, acq_fre, recorded_data_true, vmin, vmax; alpha0=100000, iter_time=20, c=1e-5, tau=0.5, search_time=5, fre_range="all", verbose=true, save_graph=true);
 
-#
+iter_time = 10;
+alpha0 = 0.1*maximum(vel_true);
+search_time = 6;
+c = 1e-4;
+tau = 0.3;
+
+vel_init, misfit_vec = steepest_gradient(vel_init, acq_fre, recorded_data_true, vmin, vmax; alpha0=alpha0, iter_time=iter_time, c=c, tau=tau, search_time=search_time, verbose=true, save_graph=true);
+
+
+clf()
+gcf()
+plot(misfit_vec)
+
 # # For three layers
 # c = 1e-5;
 # tau = 0.3;

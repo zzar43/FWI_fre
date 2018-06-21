@@ -5,7 +5,7 @@ include("model_func.jl");
 include("def_structure.jl");
 
 # Space
-# @load "data/three_layers.jld2" vel_true vel_init Nx Ny h
+# @load "data/three_layers.jld2" vel_true vel_init acq_fre
 # @load "data/marmousi.jld2" vel_true vel_init Nx Ny h
 # @load "data/overthrust.jld2" vel_true vel_init Nx Ny h
 
@@ -17,6 +17,8 @@ Nx, Ny = size(vel_true);
 h = 10;
 using ImageFiltering
 vel_init = imfilter(vel_true, Kernel.gaussian(15));
+
+# Nx = 101; Ny = 101; h = 0.01;
 
 # PML
 pml_len = 50;
