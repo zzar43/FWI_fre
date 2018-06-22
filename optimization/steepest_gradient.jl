@@ -38,6 +38,11 @@ function steepest_gradient(vel_init, source_multi, acq_fre, recorded_data_true, 
             grad = compute_gradient(vel_init, source_multi, acq_fre, fre_range,  recorded_data_true, verbose=verbose);
             # Direction
             p = -grad / maximum(abs.(grad));
+            if save_graph == true
+                matshow((p)',cmap="RdBu"); colorbar(); title("$iter_main");
+                savefig("temp_graph/vel_$iter_main.png");
+                println("Graph saved.")
+            end
             # Line search
             alpha, misfit_value = backtracking_line_search(vel_init,source_multi,acq_fre,p,grad,recorded_data_true,vmin,vmax,alpha0,tau,c,search_time,"all",verbose=verbose);
             # update velocity
