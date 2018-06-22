@@ -42,10 +42,12 @@ function steepest_gradient(vel_init, source_multi, acq_fre, recorded_data_true, 
             alpha, misfit_value = backtracking_line_search(vel_init,source_multi,acq_fre,p,grad,recorded_data_true,vmin,vmax,alpha0,tau,c,search_time,"all",verbose=verbose);
             # update velocity
             vel_init = update_velocity(vel_init,alpha,p,vmin,vmax);
-            # record misfit function
-            misfit_vec[iter_main] = misfit_value;
+
             if alpha == 0
                 break;
+            else
+                # record misfit function
+                misfit_vec[iter_main] = misfit_value;
             end
         end
         if save_graph == true

@@ -26,7 +26,8 @@ function backtracking_line_search(vel,source_multi,acq_fre,p,gradient,recorded_d
             println("Alpha: ", alpha, " search time: ", iter, "\nmisfit_diff0: ", misfit_diff0, " misfit_diff_new: ", misfit_diff_new, " difference: ", misfit_diff0-misfit_diff_new, " αt: ", alpha * t);
         end
     end
-    if misfit_diff0 < misfit_diff_new
+    # if misfit_diff0 < misfit_diff_new
+    if (misfit_diff0 - misfit_diff_new) < alpha * t
         # Two ways
         alpha = 0;
         # alpha = tau * alpha;

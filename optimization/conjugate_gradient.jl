@@ -41,11 +41,13 @@ function conjugate_gradient(vel_init, source_multi, acq_fre, recorded_data_true,
             alpha, misfit_value = backtracking_line_search(vel_init,source_multi, acq_fre,s1,grad,recorded_data_true,vmin,vmax,alpha0,tau,c,search_time,"all",verbose=verbose);
             # update velocity
             vel_init = update_velocity(vel_init,alpha,s1,vmin,vmax);
-            # record misfit function
-            misfit_vec[iter_main] = misfit_value;
+
             s0 = s1; p0 = p1;
             if alpha == 0
                 break;
+            else
+                # record misfit function
+                misfit_vec[iter_main] = misfit_value;
             end
         end
         if save_graph == true
