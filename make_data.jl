@@ -5,7 +5,7 @@ addprocs(2)
 @everywhere include("def_structure.jl");
 # @everywhere include("FWI_fre.jl");
 using JLD2, PyPlot;
-@load "data/overthrust_small.jld2" vel_true vel_init acq_fre
+@load "data/overthrust_small.jld2" vel_true vel_init
 
 @time wavefield_true, recorded_data_true = scalar_helmholtz_solver_parallel(vel_true, acq_fre, "all", true);
 
