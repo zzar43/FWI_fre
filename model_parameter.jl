@@ -19,10 +19,11 @@ include("def_structure.jl");
 # using ImageFiltering
 # vel_init = imfilter(vel_true, Kernel.gaussian(15));
 
-# h = 25;
-# Nx = 401; Ny = 151;
-h = 0.01;
-Nx = 101; Ny = 101
+h = 25;
+Nx = 401; Ny = 151;
+
+# h = 0.01;
+# Nx = 101; Ny = 101
 
 # PML
 pml_len = 50;
