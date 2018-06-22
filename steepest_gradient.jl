@@ -11,7 +11,7 @@ using JLD2, PyPlot
 
 # ================================================
 # Read data
-@load "data/overthrust_small.jld2" vel_true vel_init acq_fre;
+@load "data/overthrust_small.jld2" vel_true vel_init;
 @load "data_compute/overthrust_small.jld2" recorded_data_true;
 matshow((vel_true)', cmap="plasma"); colorbar(); savefig("temp_graph/vel_true.png")
 matshow((vel_init)', cmap="plasma"); colorbar(); savefig("temp_graph/vel_init.png")
