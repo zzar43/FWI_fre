@@ -39,12 +39,13 @@ function steepest_gradient(vel_init, source_multi, acq_fre, recorded_data_true, 
             # Direction
             p = -grad / maximum(abs.(grad));
             if save_graph == true
-                matshow((p)',cmap="RdBu"); colorbar(); title("$iter_main");
+                matshow((p)',cmap="RdBu", clim=[-1,1]); colorbar(); title("$iter_main");
                 savefig("temp_graph/grad_$iter_main.png");
                 println("Graph saved.")
             end
             # Line search
-            alpha, misfit_value = backtracking_line_search(vel_init,source_multi,acq_fre,p,grad,recorded_data_true,vmin,vmax,alpha0,tau,c,search_time,"all",verbose=verbose);
+            # alpha, misfit_value = backtracking_line_search(vel_init,source_multi,acq_fre,p,grad,recorded_data_true,vmin,vmax,alpha0,tau,c,search_time,fre_range1,verbose=verbose);
+            alpha, misfit_value = backtracking_line_search(vel_init,source_multi,acq_fre,p,grad,recorded_data_true,vmin,vmax,alpha0,tau,c,search_time,fre_range,verbose=verbose);
             # update velocity
             vel_init = update_velocity(vel_init,alpha,p,vmin,vmax);
 
@@ -52,6 +53,7 @@ function steepest_gradient(vel_init, source_multi, acq_fre, recorded_data_true, 
                 break;
             else
                 # record misfit function
+                misfit_value = compute_misfit_func(vel_init, source_multi, acq_fre, recorded_data_true, "all")
                 misfit_vec[iter_main] = misfit_value;
             end
         end
