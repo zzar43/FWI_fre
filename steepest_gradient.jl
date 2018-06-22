@@ -22,7 +22,7 @@ vmax = maximum(vel_true);
 
 
 iter_time = 5;
-alpha0 = 5;
+alpha0 = 20;
 search_time = 5;
 c = 1e-4;
 tau = 0.5;

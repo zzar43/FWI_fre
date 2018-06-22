@@ -4,24 +4,25 @@
 @everywhere include("optimization/optimization.jl");
 @everywhere include("optimization/line_search.jl");
 using JLD2, PyPlot;
-@load "data/overthrust_small.jld2" vel_true vel_init acq_fre
+@load "data/overthrust_small.jld2" vel_true vel_init
 @load "data_compute/overthrust_small.jld2" recorded_data_true
 
 
 vmax = maximum(vel_true);
 vmin = minimum(vel_true);
 
-@time grad = compute_gradient_parallel(vel_init, acq_fre, [1,2,3,4], recorded_data_true, true);
+@time grad = compute_gradient_parallel(vel_init, acq_fre, [3], recorded_data_true, true);
 p = -grad / maximum(abs.(grad));
-matshow(p', cmap="seismic", clim=[-0.05,0.05]); colorbar()
-matshow(vel_init', cmap="seismic"); colorbar()
-alpha = 1;
+matshow(p', cmap="seismic", clim=[-0.5,0.5]); colorbar()
+
+
+alpha = 15;
 vel_new = update_velocity(vel_init,alpha,p,vmin,vmax);
 matshow(vel_new', cmap="seismic"); colorbar()
 matshow(vel_true', cmap="seismic"); colorbar()
 
-j0 = compute_misfit_func(vel_init, acq_fre, recorded_data_true, [1,2,3,4])
-j1 = compute_misfit_func(vel_new, acq_fre, recorded_data_true, [1,2,3,4])
+j0 = compute_misfit_func(vel_init, acq_fre, recorded_data_true, [3])
+j1 = compute_misfit_func(vel_new, acq_fre, recorded_data_true, [3])
 matshow((vel_new-vel_init)', cmap="jet"); colorbar()
 
 @time grad1 = compute_gradient_parallel(vel_new, acq_fre, [1], recorded_data_true, true);

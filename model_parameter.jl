@@ -50,7 +50,8 @@ source_num = 81;
 source_coor = zeros(Int,source_num,2);
 for i = 1:source_num
     source_coor[i,1] = 1+(i-1)*5;
-    source_coor[i,2] = 1;
+    # source_coor[i,1] = 201;
+    source_coor[i,2] = 5;
 end
 # for i = 7:source_num
 #     source_coor[i,1] = 1+(i-7)*20;
@@ -65,7 +66,7 @@ receiver_num = Nx;
 receiver_coor = zeros(Int,receiver_num,2);
 for i = 1:receiver_num
     receiver_coor[i,1] = i;
-    receiver_coor[i,2] = 1;
+    receiver_coor[i,2] = 5;
 end
 println("Receiver number: ", receiver_num)
 # Projection operator
