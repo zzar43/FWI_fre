@@ -1,9 +1,9 @@
-function backtracking_line_search(vel,acq_fre,p,gradient,recorded_data,vmin,vmax,alpha,tau,c,search_time,fre_range,verbose=true)
+function backtracking_line_search(vel,source_multi,acq_fre,p,gradient,recorded_data,vmin,vmax,alpha,tau,c,search_time,fre_range;verbose=true)
     if fre_range == "all"
         fre_range = 1:acq_fre.fre_num
     end
     if verbose == true
-        println("Backtracking line search frequency range: ",   acq_fre.frequency[fre_range]);
+        println("Backtracking line search frequency range: ", acq_fre.frequency[fre_range]);
     end
 
     m = sum(p.*gradient);
@@ -11,8 +11,8 @@ function backtracking_line_search(vel,acq_fre,p,gradient,recorded_data,vmin,vmax
     iter = 1;
 
     vel_new = update_velocity(vel,alpha,p,vmin,vmax);
-    misfit_diff0 = compute_misfit_func(vel, acq_fre, recorded_data, fre_range);
-    misfit_diff_new = compute_misfit_func(vel_new, acq_fre, recorded_data, fre_range);
+    misfit_diff0 = compute_misfit_func(vel, source_multi, acq_fre, recorded_data, fre_range);
+    misfit_diff_new = compute_misfit_func(vel_new, source_multi, acq_fre, recorded_data, fre_range);
 
     if verbose == true
         println("Alpha: ", alpha, " search time: ", iter, "\nmisfit_diff0: ", misfit_diff0, " misfit_diff_new: ", misfit_diff_new, " difference: ", misfit_diff0-misfit_diff_new, " αt: ", alpha * t);
@@ -20,7 +20,7 @@ function backtracking_line_search(vel,acq_fre,p,gradient,recorded_data,vmin,vmax
     while (iter < search_time) && ((misfit_diff0 - misfit_diff_new) < alpha * t)
         alpha = tau * alpha;
         vel_new = update_velocity(vel,alpha,p,vmin,vmax);
-        misfit_diff_new = compute_misfit_func(vel_new, acq_fre, recorded_data, fre_range);
+        misfit_diff_new = compute_misfit_func(vel_new, source_multi, acq_fre, recorded_data, fre_range);
         iter += 1;
         if verbose == true
             println("Alpha: ", alpha, " search time: ", iter, "\nmisfit_diff0: ", misfit_diff0, " misfit_diff_new: ", misfit_diff_new, " difference: ", misfit_diff0-misfit_diff_new, " αt: ", alpha * t);
@@ -38,8 +38,8 @@ function backtracking_line_search(vel,acq_fre,p,gradient,recorded_data,vmin,vmax
     return alpha, misfit_diff_new
 end
 
-function compute_misfit_func(vel, acq_fre, recorded_data, fre_range)
-    wavefield, recorded_data_new = scalar_helmholtz_solver_parallel(vel, acq_fre, fre_range, false);
+function compute_misfit_func(vel, source_multi, acq_fre, recorded_data, fre_range)
+    wavefield, recorded_data_new = scalar_helmholtz_solver(vel, source_multi, acq_fre, fre_range, verbose=false);
     misfit_diff = 0;
     if fre_range == "all"
         fre_range = 1:acq_fre.fre_num
@@ -54,7 +54,9 @@ end
 
 function update_velocity(vel,alpha,p,vmin,vmax)
     vel_new = vel + alpha * p;
-    vel_new[find(x->(x<vmin),vel_new)] = vmin;
-    vel_new[find(x->(x>vmax),vel_new)] = vmax;
+    # vel_new[find(x->(x<vmin),vel_new)] = vmin;
+    # vel_new[find(x->(x>vmax),vel_new)] = vmax;
+    vel_new[vel_new.<vmin] = vmin;
+    vel_new[vel_new.>vmax] = vmax;
     return vel_new
 end

@@ -1,4 +1,4 @@
-addprocs(2)
+# addprocs(2)
 
 # include("model_parameter.jl");
 using JLD2, PyPlot
@@ -11,10 +11,10 @@ using JLD2, PyPlot
 
 # ================================================
 # Read data
-@load "data/overthrust_small.jld2" vel_true vel_init;
-@load "data_compute/overthrust_small.jld2" recorded_data_true;
-matshow((vel_true)', cmap="plasma"); colorbar(); savefig("temp_graph/vel_true.png")
-matshow((vel_init)', cmap="plasma"); colorbar(); savefig("temp_graph/vel_init.png")
+# @load "data/overthrust_small.jld2" vel_true vel_init;
+# @load "data_compute/overthrust_small.jld2" recorded_data_true;
+# matshow((vel_true)', cmap="plasma"); colorbar(); savefig("temp_graph/vel_true.png")
+# matshow((vel_init)', cmap="plasma"); colorbar(); savefig("temp_graph/vel_init.png")
 # ================================================
 
 vmin = minimum(vel_true);
@@ -27,7 +27,7 @@ search_time = 5;
 c = 1e-4;
 tau = 0.5;
 
-vel_init, misfit_vec = steepest_gradient(vel_init, acq_fre, recorded_data_true, vmin, vmax; alpha0=alpha0, iter_time=iter_time, c=c, tau=tau, search_time=search_time, verbose=true, save_graph=true);
+vel_init, misfit_vec = steepest_gradient(vel_init, acq_fre, recorded_data_true, vmin, vmax; alpha0=alpha0, iter_time=iter_time, c=c, tau=tau, search_time=search_time, verbose=true, save_graph=true, single_fre=3);
 
 
 clf()

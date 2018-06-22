@@ -5,10 +5,10 @@ include("model_func.jl");
 include("def_structure.jl");
 
 # Space
-# @load "data/three_layers.jld2" vel_true vel_init acq_fre
+@load "data/three_layers.jld2" vel_true vel_init acq_fre
 # @load "data/marmousi.jld2" vel_true vel_init Nx Ny h
 # @load "data/overthrust.jld2" vel_true vel_init acq_fre
-@load "data/overthrust_small.jld2" vel_true vel_init
+# @load "data/overthrust_small.jld2" vel_true vel_init
 
 # using MAT;
 # vars = matread("marmousi_dz10.mat");
@@ -19,8 +19,10 @@ include("def_structure.jl");
 # using ImageFiltering
 # vel_init = imfilter(vel_true, Kernel.gaussian(15));
 
-h = 25;
-Nx = 401; Ny = 151;
+# h = 25;
+# Nx = 401; Ny = 151;
+h = 0.01;
+Nx = 101; Ny = 101
 
 # PML
 pml_len = 50;
@@ -42,12 +44,12 @@ println("Frequency: ", frequency)
 
 # ===================================================
 # Source
-source_num = 81;
+source_num = 11;
 source_coor = zeros(Int,source_num,2);
 for i = 1:source_num
-    source_coor[i,1] = 1+(i-1)*5;
+    source_coor[i,1] = 1+(i-1)*10;
     # source_coor[i,1] = 201;
-    source_coor[i,2] = 5;
+    source_coor[i,2] = 2;
 end
 # for i = 7:source_num
 #     source_coor[i,1] = 1+(i-7)*20;
@@ -62,7 +64,7 @@ receiver_num = Nx;
 receiver_coor = zeros(Int,receiver_num,2);
 for i = 1:receiver_num
     receiver_coor[i,1] = i;
-    receiver_coor[i,2] = 5;
+    receiver_coor[i,2] = 2;
 end
 println("Receiver number: ", receiver_num)
 # Projection operator
@@ -75,4 +77,4 @@ println("Receiver number: ", receiver_num)
 # Make acquisition
 acq_fre = acquisition_fre(Nx,Ny,h,Nt,dt,t,frequency,fre_num,fre_position,source_num,source_coor,receiver_num,receiver_coor,pml_len,pml_alpha,Nx_pml,Ny_pml);
 
-@save "data/overthrust_small.jld2" vel_true vel_init acq_fre
+@save "data/three_layers.jld2" vel_true vel_init acq_fre
