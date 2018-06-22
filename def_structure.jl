@@ -10,15 +10,13 @@ struct acquisition_fre
     # frequency
     frequency::Array{Float32}
     fre_num::Int64
+    fre_position
     # source
     source_num::Int64
     source_coor
-    source_multi
     # receiver
     receiver_num::Int64
     receiver_coor
-    projection_op
-    projection_op_pml
     # PML
     pml_len::Int64
     pml_alpha::Float32

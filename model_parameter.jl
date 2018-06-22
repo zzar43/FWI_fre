@@ -19,10 +19,6 @@ include("def_structure.jl");
 # using ImageFiltering
 # vel_init = imfilter(vel_true, Kernel.gaussian(15));
 
-# Nx = 101; Ny = 101; h = 0.01;
-# vel_true = vel_true[51:451,1:151];
-# vel_init = vel_init[51:451,1:151];
-
 h = 25;
 Nx = 401; Ny = 151;
 
@@ -59,7 +55,7 @@ end
 # end
 
 println("Source number: ", source_num)
-source_multi = build_source_multi(10,0.1,t,fre_position,source_num,fre_num,true);
+# source_multi = build_source_multi(10,0.1,t,fre_position,source_num,fre_num,true);
 # ===================================================
 # Receiver
 receiver_num = Nx;
@@ -70,13 +66,13 @@ for i = 1:receiver_num
 end
 println("Receiver number: ", receiver_num)
 # Projection operator
-R = build_proj_op(Nx,Ny,receiver_coor,receiver_num);
-R_pml = build_proj_op_pml(Nx,Ny,receiver_coor,receiver_num,pml_len);
+# R = build_proj_op(Nx,Ny,receiver_coor,receiver_num);
+# R_pml = build_proj_op_pml(Nx,Ny,receiver_coor,receiver_num,pml_len);
 
 # Display model
 # draw_model(vel_true, vel_init, receiver_coor,source_coor);
 
 # Make acquisition
-acq_fre = acquisition_fre(Nx,Ny,h,Nt,dt,t,frequency,fre_num,source_num,source_coor,source_multi,receiver_num,receiver_coor,R,R_pml,pml_len,pml_alpha,Nx_pml,Ny_pml);
+acq_fre = acquisition_fre(Nx,Ny,h,Nt,dt,t,frequency,fre_num,fre_position,source_num,source_coor,receiver_num,receiver_coor,pml_len,pml_alpha,Nx_pml,Ny_pml);
 
-# @save "data/overthrust_small.jld2" vel_true vel_init
+@save "data/overthrust_small.jld2" vel_true vel_init acq_fre

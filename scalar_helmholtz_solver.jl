@@ -2,8 +2,7 @@
 # Author: Li, Da
 # Email: da.li1@ucalgary.ca
 """
-    scalar_helmholtz_solver_parallel(vel, source_multi, acq_fre, fre_range)
-    scalar_helmholtz_solver(vel, source_multi, acq_fre, fre_range)
+    scalar_helmholtz_solver_parallel(vel, acq_fre, fre_range="all", verbose=false)
 
     Input:
     vel: velocity model, should in matrix form with Nx*Ny
@@ -13,6 +12,58 @@
         If fre_range = "all", all frequency content will be computed.
 
 """
+function scalar_helmholtz_solver(vel, source_multi, acq_fre, fre_range="all"; verbose=false)
+    # This is the fundamental solver
+    # Both vel and source are matrix form with size Nx*Ny
+    Nx_pml = acq_fre.Nx_pml;
+    Ny_pml = acq_fre.Ny_pml;
+    pml_len = acq_fre.pml_len;
+    Nx = acq_fre.Nx;
+    Ny = acq_fre.Ny;
+    h = acq_fre.h;
+    frequency = acq_fre.frequency;
+    omega = frequency * 2 * pi;
+    fre_num = acq_fre.fre_num;
+    source_num = acq_fre.source_num;
+
+    if fre_range == "all"
+        fre_range = 1:fre_num
+    end
+    if verbose == true
+        println("Computing helmholtz equation with frequency range: ", frequency[fre_range]);
+    end
+
+    # Initialize
+    wavefield = SharedArray{Complex64}(Nx*Ny,fre_num,source_num);
+    recorded_data = SharedArray{Complex64}(Nx*Ny,fre_num,source_num);
+    # Extend area
+    beta, vel_ex = extend_area(vel, acq_fre);
+    # Source term
+    source_vec = change_source(source_multi, acq_fre);
+    # Receiver projector
+    R = build_proj_op(acq_fre.Nx,acq_fre.Ny,acq_fre.receiver_coor,acq_fre.receiver_num);
+
+    @sync @parallel for ind_fre in fre_range
+        A = make_diff_operator(h,omega[ind_fre],vel_ex,beta,Nx_pml,Ny_pml);
+        F = lufact(A);
+        for ind_source = 1:source_num
+            source = source_vec[:,ind_fre,ind_source];
+            # u_vec = A\source;
+            u_vec = F\source;
+            u = reshape(u_vec,Nx_pml-2,Ny_pml-2);
+            u = u[pml_len:pml_len-1+Nx,pml_len:pml_len-1+Ny];
+            u = reshape(u, Nx*Ny, 1);
+            wavefield[:,ind_fre,ind_source] = u;
+            recorded_data[:,ind_fre,ind_source] = R * u;
+        end
+        if verbose == true
+            println("Frequency: ", frequency[ind_fre], " Hz complete.");
+        end
+    end
+    wavefield = Array(wavefield);
+    recorded_data = Array(recorded_data);
+    return wavefield, recorded_data
+end
 
 # Construct the differential operator with size (Nx_pml-2)*(Ny_pml-2) by (Nx_pml-2)*(Ny_pml-2)
 function make_diff_operator(h,omega,vel_ex,beta,Nx_pml,Ny_pml)
@@ -65,13 +116,12 @@ function extend_area(vel, acq_fre)
 end
 
 # Change the source term in the vector form [(Nx_pml-2)*(Ny_pml-2), fre_num, source_num]
-function change_source(acq_fre)
+function change_source(source_multi, acq_fre)
     Nx_pml = acq_fre.Nx_pml;
     Ny_pml = acq_fre.Ny_pml;
     fre_num = acq_fre.fre_num;
     source_num = acq_fre.source_num;
     pml_len = acq_fre.pml_len;
-    source_multi = acq_fre.source_multi;
 
     # Source term
     source_vec = zeros(Complex64, (Nx_pml-2)*(Ny_pml-2), fre_num, source_num);
@@ -86,55 +136,13 @@ function change_source(acq_fre)
     return source_vec
 end
 
-function scalar_helmholtz_solver_parallel(vel, acq_fre, fre_range="all", verbose=false)
-    # This is the fundamental solver
-    # Both vel and source are matrix form with size Nx*Ny
-    Nx_pml = acq_fre.Nx_pml;
-    Ny_pml = acq_fre.Ny_pml;
-    pml_len = acq_fre.pml_len;
-    Nx = acq_fre.Nx;
-    Ny = acq_fre.Ny;
-    h = acq_fre.h;
-    frequency = acq_fre.frequency;
-    omega = frequency * 2 * pi;
-    fre_num = acq_fre.fre_num;
-    source_num = acq_fre.source_num;
-
-    if fre_range == "all"
-        fre_range = 1:fre_num
+function build_proj_op(Nx,Ny,receiver_coor,receiver_num)
+    R = spzeros(Int64,Nx*Ny,Nx*Ny);
+    receiver_ind = receiver_coor[:,1] + (receiver_coor[:,2]-1)*Nx;
+    for i = 1:receiver_num
+        R[receiver_ind[i],receiver_ind[i]] = 1;
     end
-    if verbose == true
-        println("Computing helmholtz equation with frequency range: ", frequency[fre_range]);
-    end
-
-    # Initialize
-    wavefield = SharedArray{Complex64}(Nx*Ny,fre_num,source_num);
-    recorded_data = SharedArray{Complex64}(Nx*Ny,fre_num,source_num);
-    # Extend area
-    beta, vel_ex = extend_area(vel, acq_fre);
-    # Source term
-    source_vec = change_source(acq_fre);
-
-    @sync @parallel for ind_fre in fre_range
-        A = make_diff_operator(h,omega[ind_fre],vel_ex,beta,Nx_pml,Ny_pml);
-        F = lufact(A);
-        for ind_source = 1:source_num
-            source = source_vec[:,ind_fre,ind_source];
-            # u_vec = A\source;
-            u_vec = F\source;
-            u = reshape(u_vec,Nx_pml-2,Ny_pml-2);
-            u = u[pml_len:pml_len-1+Nx,pml_len:pml_len-1+Ny];
-            u = reshape(u, Nx*Ny, 1);
-            wavefield[:,ind_fre,ind_source] = u;
-            recorded_data[:,ind_fre,ind_source] = acq_fre.projection_op * u;
-        end
-        if verbose == true
-            println("Frequency: ", frequency[ind_fre], " Hz complete.");
-        end
-    end
-    wavefield = Array(wavefield);
-    recorded_data = Array(recorded_data);
-    return wavefield, recorded_data
+    return R
 end
 
 # Save the old code
