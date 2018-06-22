@@ -134,7 +134,6 @@ function scalar_helmholtz_solver_parallel(vel, acq_fre, fre_range="all", verbose
     end
     wavefield = Array(wavefield);
     recorded_data = Array(recorded_data);
-
     return wavefield, recorded_data
 end
 

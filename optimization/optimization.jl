@@ -50,7 +50,7 @@ function steepest_gradient(vel_init, acq_fre, recorded_data_true, vmin, vmax; al
         end
         if save_graph == true
             title_name = acq_fre.frequency[ind_fre];
-            matshow((vel_init)'); colorbar(); title("$title_name Hz")
+            matshow((vel_init)',cmap="seismic"); colorbar(); title("$title_name Hz"); tight_layout();
             savefig("temp_graph/vel_$ind_fre.png");
             println("Graph saved.")
         end
@@ -58,6 +58,7 @@ function steepest_gradient(vel_init, acq_fre, recorded_data_true, vmin, vmax; al
     misfit_vec = misfit_vec[1:iter_main];
     return vel_init, misfit_vec
 end
+
 
 #
 # function steepest_gradient(vel_init, acq_fre, recorded_data_true, vmin, vmax; alpha0=1, iter_time=10, c=1e-5, tau=0.5, search_time=4, mode="all", verbose=false, save_graph=false)

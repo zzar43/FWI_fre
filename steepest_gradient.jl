@@ -11,8 +11,8 @@ using JLD2, PyPlot
 
 # ================================================
 # Read data
-@load "data/marmousi.jld2" vel_true vel_init acq_fre;
-@load "data_compute/marmousi.jld2" wavefield_true recorded_data_true;
+@load "data/overthrust_small.jld2" vel_true vel_init acq_fre;
+@load "data_compute/overthrust_small.jld2" recorded_data_true;
 matshow((vel_true)', cmap="plasma"); colorbar(); savefig("temp_graph/vel_true.png")
 matshow((vel_init)', cmap="plasma"); colorbar(); savefig("temp_graph/vel_init.png")
 # ================================================
@@ -21,11 +21,11 @@ vmin = minimum(vel_true);
 vmax = maximum(vel_true);
 
 
-iter_time = 10;
-alpha0 = 0.1*maximum(vel_true);
-search_time = 6;
+iter_time = 5;
+alpha0 = 5;
+search_time = 5;
 c = 1e-4;
-tau = 0.3;
+tau = 0.5;
 
 vel_init, misfit_vec = steepest_gradient(vel_init, acq_fre, recorded_data_true, vmin, vmax; alpha0=alpha0, iter_time=iter_time, c=c, tau=tau, search_time=search_time, verbose=true, save_graph=true);
 
