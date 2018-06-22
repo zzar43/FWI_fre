@@ -10,6 +10,9 @@ function build_source_multi(center_fre,center_time,acq_fre;ricker=true)
     fre_position = acq_fre.fre_position;
     source_num = acq_fre.source_num;
     fre_num = acq_fre.fre_num;
+    Nx = acq_fre.Nx;
+    Ny = acq_fre.Ny;
+    source_coor = acq_fre.source_coor;
 
     if ricker == true
         source_time = source_ricker(center_fre, center_time, t);

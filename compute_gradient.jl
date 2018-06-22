@@ -2,7 +2,9 @@
 # Author: Li, Da
 # Email: da.li1@ucalgary.ca
 
-function compute_gradient_parallel(vel, acq_fre, fre_range, recorded_data, verbose=false)
+include("scalar_helmholtz_solver.jl");
+
+function compute_gradient(vel, source_multi, acq_fre, fre_range, recorded_data; verbose=false)
     Nx_pml = acq_fre.Nx_pml;
     Ny_pml = acq_fre.Ny_pml;
     pml_len = acq_fre.pml_len;
@@ -13,8 +15,6 @@ function compute_gradient_parallel(vel, acq_fre, fre_range, recorded_data, verbo
     omega = frequency * 2 * pi;
     fre_num = acq_fre.fre_num;
     source_num = acq_fre.source_num;
-    source_multi = acq_fre.source_multi;
-    R = acq_fre.projection_op;
 
     if fre_range == "all"
         fre_range = 1:fre_num
@@ -32,6 +32,8 @@ function compute_gradient_parallel(vel, acq_fre, fre_range, recorded_data, verbo
     # Source term
     # Size: Nx_pml-2 * Ny_pml-2
     source_vec = change_source(acq_fre);
+    # Receiver projector
+    R = build_proj_op(acq_fre.Nx,acq_fre.Ny,acq_fre.receiver_coor,acq_fre.receiver_num);
 
     # Main loop
     @sync @parallel for ind_fre in fre_range
@@ -61,7 +63,12 @@ function compute_gradient_parallel(vel, acq_fre, fre_range, recorded_data, verbo
             u_back = u_back[pml_len:pml_len-1+Nx,pml_len:pml_len-1+Ny];
 
             # Gradient
-            grad = real(-omega[ind_fre].^2 ./ (vel.^3) .* u_forward .* u_back);
+            # Theorical right gradient
+            # grad = real(-omega[ind_fre].^2 ./ (vel.^3) .* u_forward .* u_back);
+            # Energy compensation
+            # grad = real(-omega[ind_fre].^2 ./ (vel.^3) .* u_forward .* u_back) ./ (abs(u_forward)+0.1);
+            # Working gradient
+            grad = -real(omega[ind_fre].^2 .* u_forward .* u_back);
             gradient[:,ind_fre,ind_source] = reshape(grad, Nx*Ny, 1);
         end
         if verbose == true
