@@ -13,7 +13,7 @@ function conjugate_gradient(vel_init, source_multi, acq_fre, recorded_data_true,
 
         iter_main += 1;
         if verbose == true
-            println("\nSteepest Gradient Iteration: ", iter_main, " frequency: ", acq_fre.frequency[ind_fre]);
+            println("\nConjugate Gradient Iteration: ", iter_main, " frequency: ", acq_fre.frequency[ind_fre]);
         end
         grad = compute_gradient(vel_init, source_multi, acq_fre, fre_range, recorded_data_true, verbose=verbose);
         p0 = -grad / maximum(abs.(grad));
@@ -28,10 +28,10 @@ function conjugate_gradient(vel_init, source_multi, acq_fre, recorded_data_true,
         for iter = 1:(iter_time-1)
             iter_main += 1
             if verbose == true
-                println("\nSteepest Gradient Iteration: ", iter_main, " frequency: ", acq_fre.frequency[ind_fre], " at CG step.");
+                println("\nConjugate Gradient Iteration: ", iter_main, " frequency: ", acq_fre.frequency[ind_fre], " at CG step.");
             end
             # Compute gradient
-            grad = compute_gradient(vel_init, source_multi, acq_fre, fre_range, recorded_data_true, verbose);
+            grad = compute_gradient(vel_init, source_multi, acq_fre, fre_range, recorded_data_true, verbose=verbose);
             # Direction
             p1 = -grad / maximum(abs.(grad));
             beta_pr = sum(p1.*(p1-p0)) / sum(p0.*p0);
@@ -50,7 +50,7 @@ function conjugate_gradient(vel_init, source_multi, acq_fre, recorded_data_true,
         end
         if save_graph == true
             title_name = acq_fre.frequency[ind_fre];
-            matshow((vel_init)'); colorbar(); title("$title_name Hz")
+            matshow((vel_init)',cmap="jet"); colorbar(); title("$title_name Hz")
             savefig("temp_graph/vel_$ind_fre.png");
             println("Graph saved.")
         end

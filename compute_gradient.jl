@@ -31,7 +31,7 @@ function compute_gradient(vel, source_multi, acq_fre, fre_range, recorded_data; 
     beta, vel_ex = extend_area(vel, acq_fre);
     # Source term
     # Size: Nx_pml-2 * Ny_pml-2
-    source_vec = change_source(acq_fre);
+    source_vec = change_source(source_multi,acq_fre);
     # Receiver projector
     R = build_proj_op(acq_fre.Nx,acq_fre.Ny,acq_fre.receiver_coor,acq_fre.receiver_num);
 
