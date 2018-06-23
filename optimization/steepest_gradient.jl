@@ -32,7 +32,7 @@ function steepest_gradient(vel_init, source_multi, acq_fre, recorded_data_true, 
         for iter = 1:iter_time
             iter_main += 1
             if verbose == true
-                println("\nSteepest Gradient Iteration: ", iter_main);
+                println("\nSteepest Gradient Iteration: ", iter_main, " frequency: ", acq_fre.frequency[ind_fre]);
             end
             # Compute gradient
             grad = compute_gradient(vel_init, source_multi, acq_fre, fre_range,  recorded_data_true, verbose=verbose);
@@ -40,8 +40,8 @@ function steepest_gradient(vel_init, source_multi, acq_fre, recorded_data_true, 
             p = -grad / maximum(abs.(grad));
             if save_graph == true
                 matshow((p)',cmap="RdBu", clim=[-1,1]); colorbar(); title("$iter_main");
-                savefig("temp_graph/grad_$iter_main.png");
-                println("Graph saved.")
+                savefig("temp_graph/direction_$iter_main.png");
+                println("Direction graph saved.")
             end
             # Line search
             # alpha, misfit_value = backtracking_line_search(vel_init,source_multi,acq_fre,p,grad,recorded_data_true,vmin,vmax,alpha0,tau,c,search_time,fre_range1,verbose=verbose);
@@ -55,13 +55,14 @@ function steepest_gradient(vel_init, source_multi, acq_fre, recorded_data_true, 
                 # record misfit function
                 misfit_value = compute_misfit_func(vel_init, source_multi, acq_fre, recorded_data_true, "all")
                 misfit_vec[iter_main] = misfit_value;
+                println("Misfit value is: ", misfit_value)
             end
         end
         if save_graph == true
             title_name = acq_fre.frequency[ind_fre];
             matshow((vel_init)',cmap="RdBu"); colorbar(); title("$title_name Hz");
             savefig("temp_graph/vel_$ind_fre.png");
-            println("Graph saved.")
+            println("Velocity graph saved.")
         end
     end
     misfit_vec = misfit_vec[1:iter_main];

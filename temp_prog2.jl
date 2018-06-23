@@ -37,4 +37,4 @@ matshow((vel_2)');colorbar()
 matshow((vel_3 - vel_4)');colorbar()
 
 
-@save "overthrust_small_data.jld2" vel_1 vel_2 vel_3 vel_4 vel_5 vel_6 vel_7 vel_8
+@save "overthrust_small_data.jld2" vel_1 vel_2 vel_3 vel_4 vel_5 vel_6 vel_7 vel_8 vel_9
