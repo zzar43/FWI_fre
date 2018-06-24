@@ -15,4 +15,4 @@ source_multi = build_source_multi(10,0.1,acq_fre,ricker=true);
 
 @save "data_compute/overthrust_small.jld2" wavefield_true recorded_data_true
 
-matshow(real(reshape(wavefield_true[:,7,5],acq_fre.Nx,acq_fre.Ny)'),cmap="RdBu",clim=[-2,2]); colorbar(); savefig("temp_graph/wavefield.png")
+matshow(real(reshape(wavefield_true[:,8,40],acq_fre.Nx,acq_fre.Ny)'),cmap="RdBu",clim=[-2,2]); colorbar(); savefig("temp_graph/wavefield.png")

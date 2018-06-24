@@ -1,4 +1,4 @@
-function conjugate_gradient(vel_init, source_multi, acq_fre, recorded_data_true, vmin, vmax; alpha0=1, iter_time=10, c=1e-5, tau=0.5, search_time=4, verbose=false, save_graph=false, single_fre=false)
+function conjugate_gradient(vel_init, source_multi, acq_fre, recorded_data_true, vmin, vmax; alpha0=1, iter_time=10, c=1e-5, tau=0.5, search_time=4, verbose=false, save_graph=false, save_misfit=false, single_fre=false)
 
     misfit_vec = zeros(Float32, iter_time * acq_fre.fre_num);
 
@@ -22,7 +22,18 @@ function conjugate_gradient(vel_init, source_multi, acq_fre, recorded_data_true,
         alpha, misfit_value = backtracking_line_search(vel_init,source_multi,acq_fre,p0,grad,recorded_data_true,vmin,vmax,alpha0,tau,c,search_time,fre_range,verbose=verbose);
         # update velocity
         vel_init = update_velocity(vel_init,alpha,p0,vmin,vmax);
+        if save_graph == true
+            matshow((s0)',cmap="RdBu", clim=[-1,1]); colorbar(); title("$iter_main");
+            savefig("temp_graph/direction_$iter_main.png");
+            println("Direction graph saved.")
+        end
         # record misfit function
+        if save_misfit == true
+            misfit_value = compute_misfit_func(vel_init, source_multi, acq_fre, recorded_data_true, "all");
+            println("Misfit value is: ", misfit_value)
+        else
+            misfit_value = 0;
+        end
         misfit_vec[iter_main] = misfit_value;
 
         for iter = 1:(iter_time-1)
@@ -38,7 +49,7 @@ function conjugate_gradient(vel_init, source_multi, acq_fre, recorded_data_true,
             beta_pr = max(0,beta_pr);
             s1 = p1 + beta_pr * s0;
             # Line search
-            alpha, misfit_value = backtracking_line_search(vel_init,source_multi, acq_fre,s1,grad,recorded_data_true,vmin,vmax,alpha0,tau,c,search_time,"all",verbose=verbose);
+            alpha, misfit_value = backtracking_line_search(vel_init,source_multi, acq_fre,s1,grad,recorded_data_true,vmin,vmax,alpha0,tau,c,search_time,fre_range,verbose=verbose);
             # update velocity
             vel_init = update_velocity(vel_init,alpha,s1,vmin,vmax);
             if save_graph == true
@@ -52,16 +63,20 @@ function conjugate_gradient(vel_init, source_multi, acq_fre, recorded_data_true,
                 break;
             else
                 # record misfit function
-                misfit_value = compute_misfit_func(vel_init, source_multi, acq_fre, recorded_data_true, "all")
+                if save_misfit == true
+                    misfit_value = compute_misfit_func(vel_init, source_multi, acq_fre, recorded_data_true, "all");
+                    println("Misfit value is: ", misfit_value)
+                else
+                    misfit_value = 0;
+                end
                 misfit_vec[iter_main] = misfit_value;
-                println("Misfit value is: ", misfit_value)
             end
         end
         if save_graph == true
             title_name = acq_fre.frequency[ind_fre];
-            matshow((vel_init)',cmap="RdBu"); colorbar(); title("$title_name Hz")
+            matshow((vel_init)',cmap="PuBu"); colorbar(); title("$title_name Hz")
             savefig("temp_graph/vel_$ind_fre.png");
-            println("Graph saved.")
+            println("Velocity graph saved.")
         end
     end
     misfit_vec = misfit_vec[1:iter_main];

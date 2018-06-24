@@ -5,10 +5,10 @@ include("model_func.jl");
 include("def_structure.jl");
 
 # Space
-@load "data/three_layers.jld2" vel_true vel_init acq_fre
+# @load "data/three_layers.jld2" vel_true vel_init acq_fre
 # @load "data/marmousi.jld2" vel_true vel_init Nx Ny h
 # @load "data/overthrust.jld2" vel_true vel_init acq_fre
-# @load "data/overthrust_small.jld2" vel_true vel_init
+@load "data/overthrust_small.jld2" vel_true vel_init
 
 # using MAT;
 # vars = matread("marmousi_dz10.mat");
@@ -18,9 +18,12 @@ include("def_structure.jl");
 # h = 10;
 # using ImageFiltering
 # vel_init = imfilter(vel_true, Kernel.gaussian(15));
-
+vel_init = vel_init[:,21:end];
+vel_true = vel_true[:,21:end];
+matshow(vel_init')
+size(vel_init)
 h = 25;
-Nx = 401; Ny = 151;
+Nx = 401; Ny = 131;
 
 # h = 0.01;
 # Nx = 101; Ny = 101
@@ -45,10 +48,10 @@ println("Frequency: ", frequency)
 
 # ===================================================
 # Source
-source_num = 11;
+source_num = 81;
 source_coor = zeros(Int,source_num,2);
 for i = 1:source_num
-    source_coor[i,1] = 1+(i-1)*10;
+    source_coor[i,1] = 1+(i-1)*5;
     # source_coor[i,1] = 201;
     source_coor[i,2] = 2;
 end
@@ -78,4 +81,4 @@ println("Receiver number: ", receiver_num)
 # Make acquisition
 acq_fre = acquisition_fre(Nx,Ny,h,Nt,dt,t,frequency,fre_num,fre_position,source_num,source_coor,receiver_num,receiver_coor,pml_len,pml_alpha,Nx_pml,Ny_pml);
 
-@save "data/three_layers.jld2" vel_true vel_init acq_fre
+@save "data/overthrust_small.jld2" vel_true vel_init acq_fre
