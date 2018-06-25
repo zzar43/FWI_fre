@@ -48,11 +48,11 @@ println("Frequency: ", frequency)
 
 # ===================================================
 # Source
-source_num = 81;
+source_num = 1;
 source_coor = zeros(Int,source_num,2);
 for i = 1:source_num
     source_coor[i,1] = 1+(i-1)*5;
-    # source_coor[i,1] = 201;
+    source_coor[i,1] = 201;
     source_coor[i,2] = 2;
 end
 # for i = 7:source_num
