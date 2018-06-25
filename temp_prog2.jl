@@ -32,18 +32,18 @@ source = make_source(conf,ind_fre=ind_fre,ind_source=ind_source);
 u_forward_vec = F\source; # size [Nx_pml*Ny_pml,1]
 r_forward_vec = R2 * u_forward_vec; # size [Nx_pml*Ny_pml,1]
 
-matshow(real(reshape(r_forward_vec,Nx_pml,Ny_pml))');
+matshow(real(reshape(u_forward_vec,Nx_pml,Ny_pml))');
 
-source_adjoint = -1 * (r_forward_vec - R1.'*recorded_data[:,ind_fre,ind_source]);
-plot(real(recorded_data[:,ind_fre,ind_source]))
-matshow(real(reshape(source_adjoint,Nx_pml,Ny_pml))');
+source_adjoint = -1 * conj(r_forward_vec - R1.'*recorded_data[:,ind_fre,ind_source]);
+# plot(real(recorded_data[:,ind_fre,ind_source]))
+# matshow(real(reshape(source_adjoint,Nx_pml,Ny_pml))');
 
 u_back_vec = F\source_adjoint; # size [Nx_pml*Ny_pml,1]
 u_back = reshape(u_back_vec,Nx_pml,Ny_pml); matshow(real(u_back'));
-grad = real(omega[ind_fre].^2 .* conj(u_forward_vec) .* u_back_vec);
+grad = real(omega[ind_fre].^2 .* u_forward_vec .* u_back_vec);
 grad = reshape(grad,Nx_pml,Ny_pml);
-matshow(grad')
-plot(real(R1*source_adjoint))
+grad = grad[conf.pml_len+1:end-conf.pml_len,conf.pml_len+1:end-conf.pml_len];
+matshow(grad'); colorbar()
 
 A = make_diff_operator(vel,conf,ind_fre=ind_fre);
 B =  make_diff_operator(vel_true,conf,ind_fre=ind_fre);

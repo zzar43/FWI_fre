@@ -39,7 +39,7 @@ function compute_gradient(vel, conf, recorded_data; fre_range="all", verbose=fal
 
             # Adjoint source
             r_forward_vec = R2 * u_forward_vec; # size [Nx_pml*Ny_pml,1]
-            source_adjoint = -1 * (r_forward_vec - R1.'*recorded_data[:,ind_fre,ind_source]);
+            source_adjoint = -1 * conj(r_forward_vec - R1.'*recorded_data[:,ind_fre,ind_source]);
 
             # Backward
             u_back_vec = F\source_adjoint; # size [Nx_pml*Ny_pml,1]
@@ -50,7 +50,7 @@ function compute_gradient(vel, conf, recorded_data; fre_range="all", verbose=fal
             # Energy compensation
             # grad = real(-omega[ind_fre].^2 ./ (vel.^3) .* u_forward .* u_back) ./ (abs(u_forward)+0.1);
             # Working gradient
-            grad = real(omega[ind_fre].^2 .* conj(u_forward_vec) .* u_back_vec);
+            grad = real(omega[ind_fre].^2 .* u_forward_vec .* u_back_vec);
             gradient[:,ind_fre,ind_source] = grad;
         end
         if verbose == true
