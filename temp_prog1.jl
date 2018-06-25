@@ -13,7 +13,7 @@ matshow((vel_init)',cmap="PuBu",clim=[vmin,vmax]); colorbar(); title("Initial mo
 savefig("temp_graph/vel_init.png");
 
 grad = compute_gradient(vel_init, source_multi, acq_fre, [5], recorded_data_true; verbose=true)
-matshow(grad');colorbar()
+matshow(grad');colorbar();savefig("test_grad1.png")
 # Source term
 source_multi = build_source_multi(10,0.1,acq_fre,ricker=true);
 

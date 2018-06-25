@@ -18,10 +18,10 @@ include("def_structure.jl");
 # h = 10;
 # using ImageFiltering
 # vel_init = imfilter(vel_true, Kernel.gaussian(15));
-vel_init = vel_init[:,21:end];
-vel_true = vel_true[:,21:end];
-matshow(vel_init')
-size(vel_init)
+# vel_init = vel_init[:,21:end];
+# vel_true = vel_true[:,21:end];
+# matshow(vel_init')
+# size(vel_init)
 h = 25;
 Nx = 401; Ny = 131;
 
@@ -48,11 +48,11 @@ println("Frequency: ", frequency)
 
 # ===================================================
 # Source
-source_num = 1;
+source_num = 41;
 source_coor = zeros(Int,source_num,2);
 for i = 1:source_num
-    source_coor[i,1] = 1+(i-1)*5;
-    source_coor[i,1] = 201;
+    source_coor[i,1] = 1+(i-1)*10;
+    # source_coor[i,1] = 201;
     source_coor[i,2] = 2;
 end
 # for i = 7:source_num
@@ -81,4 +81,4 @@ println("Receiver number: ", receiver_num)
 # Make acquisition
 acq_fre = acquisition_fre(Nx,Ny,h,Nt,dt,t,frequency,fre_num,fre_position,source_num,source_coor,receiver_num,receiver_coor,pml_len,pml_alpha,Nx_pml,Ny_pml);
 
-@save "data/overthrust_small.jld2" vel_true vel_init acq_fre
+# @save "data/overthrust_small.jld2" vel_true vel_init acq_fre
