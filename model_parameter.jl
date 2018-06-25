@@ -38,19 +38,19 @@ dt = 1/sample_fre;
 Nt = 1000;
 t = linspace(0,(Nt-1)*dt,Nt);
 fre = sample_fre * linspace(0,1-1/Nt,Nt);
-fre_position = 2:2:14;
+fre_position = 2:2:16;
 frequency = fre[fre_position];
 fre_num = length(frequency);
 println("Frequency: ", frequency)
 
 # ===================================================
 # Source
-source_num = 81;
+source_num = 41;
 source_coor = zeros(Int,source_num,2);
 for i = 1:source_num
-    source_coor[i,1] = 1 + 5*(i-1);
+    source_coor[i,1] = 1 + 10*(i-1);
     # source_coor[i,1] = 201;
-    source_coor[i,2] = 3;
+    source_coor[i,2] = 2;
 end
 ricker_func = source_ricker(10, 0.1, t);
 source_value = ricker_func[fre_position]
@@ -67,7 +67,7 @@ receiver_num = Nx;
 receiver_coor = zeros(Int,receiver_num,2);
 for i = 1:receiver_num
     receiver_coor[i,1] = i;
-    receiver_coor[i,2] = 3;
+    receiver_coor[i,2] = 2;
 end
 println("Receiver number: ", receiver_num)
 # Projection operator
@@ -78,7 +78,7 @@ println("Receiver number: ", receiver_num)
 # draw_model(vel_true, vel_init, receiver_coor,source_coor);
 
 # Make acquisition
-acq_fre = acquisition_fre(Nx,Ny,h,Nt,dt,t,frequency,fre_num,fre_position,source_num,source_coor,receiver_num,receiver_coor,pml_len,pml_alpha,Nx_pml,Ny_pml);
+# acq_fre = acquisition_fre(Nx,Ny,h,Nt,dt,t,frequency,fre_num,fre_position,source_num,source_coor,receiver_num,receiver_coor,pml_len,pml_alpha,Nx_pml,Ny_pml);
 
 conf = configuration(Nx,Ny,h,Nt,dt,t,frequency,fre_num,fre_position,source_num,source_coor,source_value,receiver_num,receiver_coor,pml_len,pml_alpha)
 

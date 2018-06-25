@@ -120,7 +120,6 @@ function build_proj_op1(conf)
     Ny_pml = conf.Ny + 2*conf.pml_len;
     R = spzeros(Int64,conf.receiver_num,Nx_pml*Ny_pml);
     receiver_coor = conf.receiver_coor + conf.pml_len;
-    Nx_pml = conf.Nx + 2*conf.pml_len;
 
     receiver_ind = receiver_coor[:,1] + (receiver_coor[:,2]-1)*Nx_pml;
     for i = 1:conf.receiver_num
