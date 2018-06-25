@@ -18,10 +18,7 @@ include("def_structure.jl");
 # h = 10;
 # using ImageFiltering
 # vel_init = imfilter(vel_true, Kernel.gaussian(15));
-vel_init = vel_init[:,21:end];
-vel_true = vel_true[:,21:end];
-matshow(vel_init')
-size(vel_init)
+
 h = 25;
 Nx = 401; Ny = 131;
 
@@ -41,7 +38,7 @@ dt = 1/sample_fre;
 Nt = 1000;
 t = linspace(0,(Nt-1)*dt,Nt);
 fre = sample_fre * linspace(0,1-1/Nt,Nt);
-fre_position = 2:2:16;
+fre_position = 3:2:13;
 frequency = fre[fre_position];
 fre_num = length(frequency);
 println("Frequency: ", frequency)
@@ -51,10 +48,12 @@ println("Frequency: ", frequency)
 source_num = 81;
 source_coor = zeros(Int,source_num,2);
 for i = 1:source_num
-    source_coor[i,1] = 1+(i-1)*5;
+    source_coor[i,1] = 1 + 5*(i-1);
     # source_coor[i,1] = 201;
-    source_coor[i,2] = 2;
+    source_coor[i,2] = 1;
 end
+ricker_func = source_ricker(8, 0.1, t);
+source_value = ricker_func[fre_position]
 # for i = 7:source_num
 #     source_coor[i,1] = 1+(i-7)*20;
 #     source_coor[i,2] = 101;
@@ -81,4 +80,7 @@ println("Receiver number: ", receiver_num)
 # Make acquisition
 acq_fre = acquisition_fre(Nx,Ny,h,Nt,dt,t,frequency,fre_num,fre_position,source_num,source_coor,receiver_num,receiver_coor,pml_len,pml_alpha,Nx_pml,Ny_pml);
 
-@save "data/overthrust_small.jld2" vel_true vel_init acq_fre
+conf = configuration(Nx,Ny,h,Nt,dt,t,frequency,fre_num,fre_position,source_num,source_coor,source_value,receiver_num,receiver_coor,pml_len,pml_alpha)
+
+
+@save "data/overthrust_small.jld2" vel_true vel_init conf
