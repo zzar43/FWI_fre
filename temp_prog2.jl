@@ -73,5 +73,5 @@ u3 = A\source_adj;
 u31 = reshape(u3,Nx_pml,Ny_pml);
 matshow(real(u31)');colorbar()
 
-grad = conj(u11) .* u31;
+grad = real(conj(u11) .* u31);
 matshow(grad')
