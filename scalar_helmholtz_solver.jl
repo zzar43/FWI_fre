@@ -13,7 +13,7 @@
 
 """
 
-function scalar_helmholtz_solver(vel, conf; fre_range="all", verbose=false)
+function scalar_helmholtz_solver(vel, conf; fre_range="all", verbose::Bool=false)
     # This is the fundamental solver
     Nx_pml = conf.Nx + 2*conf.pml_len;
     Ny_pml = conf.Ny + 2*conf.pml_len;
@@ -63,7 +63,7 @@ function scalar_helmholtz_solver(vel, conf; fre_range="all", verbose=false)
     return wavefield, recorded_data
 end
 
-function make_diff_operator(vel,conf;ind_fre=1)
+function make_diff_operator(vel,conf;ind_fre::Int64=1)
     Nx_pml = conf.Nx + 2*conf.pml_len;
     Ny_pml = conf.Ny + 2*conf.pml_len;
     pml_value = linspace(0,conf.pml_alpha,conf.pml_len);
@@ -103,7 +103,7 @@ function make_diff_operator(vel,conf;ind_fre=1)
     return A
 end
 
-function make_source(conf;ind_fre=1,ind_source=1)
+function make_source(conf;ind_fre::Int64=1,ind_source::Int64=1)
     # Change the coordinates into pml version
     source_coor = conf.source_coor[ind_source,:] + conf.pml_len;
     Nx_pml = conf.Nx + 2*conf.pml_len;

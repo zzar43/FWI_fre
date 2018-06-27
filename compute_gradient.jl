@@ -4,7 +4,7 @@
 
 include("scalar_helmholtz_solver.jl");
 
-function compute_gradient(vel, conf, recorded_data; fre_range="all", verbose=false)
+function compute_gradient(vel, conf, recorded_data; fre_range="all", verbose::Bool=false)
     Nx_pml = conf.Nx + 2*conf.pml_len;
     Ny_pml = conf.Ny + 2*conf.pml_len;
     omega = 2*pi*conf.frequency;
@@ -22,7 +22,7 @@ function compute_gradient(vel, conf, recorded_data; fre_range="all", verbose=fal
 
     # Initialize
     gradient = SharedArray{Float32}(Nx_pml*Ny_pml, conf.fre_num, conf.source_num);
-    # recorded_forward = SharedArray{Complex64}(Nx*Ny,fre_num,source_num);
+    # recorded_forward = SharedArray{Complex64}(conf.receiver_num,fre_num,source_num);
     misfit_diff = 0.0;
     # Receiver projector
     R1 = build_proj_op1(conf);
@@ -36,20 +36,16 @@ function compute_gradient(vel, conf, recorded_data; fre_range="all", verbose=fal
             source = make_source(conf,ind_fre=ind_fre,ind_source=ind_source);
             # Forward
             u_forward_vec = F\source; # size [Nx_pml*Ny_pml,1]
+            misfit_diff += 0.5 * norm(R1*u_forward_vec - recorded_data[:,ind_fre,ind_source])^2
 
             # Adjoint source
             r_forward_vec = R2 * u_forward_vec; # size [Nx_pml*Ny_pml,1]
-            source_adjoint = -1 * conj(r_forward_vec - R1.'*recorded_data[:,ind_fre,ind_source]);
+            source_adjoint = conj(r_forward_vec - R1.'*recorded_data[:,ind_fre,ind_source]);
 
             # Backward
             u_back_vec = F\source_adjoint; # size [Nx_pml*Ny_pml,1]
 
             # Gradient
-            # Theorical right gradient ?
-            # grad = real(-omega[ind_fre].^2 ./ (vel.^3) .* u_forward .* u_back);
-            # Energy compensation
-            # grad = real(-omega[ind_fre].^2 ./ (vel.^3) .* u_forward .* u_back) ./ (abs(u_forward)+0.1);
-            # Working gradient
             grad = real(omega[ind_fre].^2 .* u_forward_vec .* u_back_vec);
             gradient[:,ind_fre,ind_source] = grad;
         end
@@ -62,7 +58,7 @@ function compute_gradient(vel, conf, recorded_data; fre_range="all", verbose=fal
     gradient = reshape(gradient,Nx_pml,Ny_pml);
     gradient = gradient[conf.pml_len+1:end-conf.pml_len,conf.pml_len+1:end-conf.pml_len];
     gradient = Array(gradient);
-    return gradient
+    return gradient, misfit_diff
 end
 
 function build_proj_op2(conf)
