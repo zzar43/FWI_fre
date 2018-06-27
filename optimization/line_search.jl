@@ -1,9 +1,6 @@
 function zoomin(alpha_hi, alpha_lo, phi_lo, phi_0, phi_0_diff, vel_init, p, c1, c2, vmin, vmax, fre_range, zoom_time)
     alpha = 0;
-    # safe stop
-    phi_pre = 0;
-    stop_ind = 0;
-    println("\nStart zoom.")
+    println("Start zoom.")
 
     for j = 1:zoom_time
         alpha_j = 0.5 * (alpha_hi + alpha_lo);
@@ -12,23 +9,15 @@ function zoomin(alpha_hi, alpha_lo, phi_lo, phi_0, phi_0_diff, vel_init, p, c1, 
         grad_j, phi_j = compute_gradient(vel_j, conf, recorded_data; fre_range=fre_range, verbose=false);
         println("phi_j: ", phi_j, " phi_0 + c1*alpha_j*phi_0_diff: ", phi_0 + c1*alpha_j*phi_0_diff, " phi_lo: ", phi_lo)
 
-        if abs(phi_pre-phi_j)/phi_pre < 0.05
-            stop_ind += 1;
-        end
-        if stop_ind == 3
-            println("phi decrease too slow")
-            break;
-        end
-
         if (phi_j>(phi_0 + c1*alpha_j*phi_0_diff)) || (phi_j >= phi_lo)
             alpha_hi = alpha_j;
-            println("alpha_hi = alpha_j")
+            # println("alpha_hi = alpha_j")
         else
             # phi_j_diff = sum((-1*grad_j./maximum(grad_j)) .* grad_j);
             phi_j_diff = sum(p .* grad_j);
             println("phi_j_diff: ", phi_j_diff, " -c2 * phi_0_diff: ", -c2 * phi_0_diff);
             if (abs(phi_j_diff) <= -c2 * phi_0_diff)
-                println("alpha is: ", alpha_j)
+                # println("alpha is: ", alpha_j)
                 alpha = alpha_j;
                 break;
             end
@@ -63,7 +52,7 @@ function line_search(vel_init, conf, recorded_data, grad_0, p_0, phi_0, alpha_1,
         println("Search time: ", iter, " alpha_1: ", alpha_1)
         vel_1 = update_velocity(vel_init,alpha_1,p_0,vmin,vmax);
         grad_1, phi_1 = compute_gradient(vel_1, conf, recorded_data; fre_range=fre_range, verbose=false);
-        println("phi_1: ", phi_1, " phi_0 + c1*alpha_1*phi_0_diff: ", phi_0 + c1*alpha_1*phi_0_diff, " phi_0: ",phi_0);
+        println("phi_1: ", phi_1, "; (phi_0 + c1*alpha_1*phi_0_diff): ", phi_0 + c1*alpha_1*phi_0_diff, " phi_0: ",phi_0);
         if (phi_1>(phi_0 + c1*alpha_1*phi_0_diff)) || ((phi_1>=phi_0)&&(iter>1))
             alpha = zoomin(alpha_1, alpha_0, phi_0, phi_0, phi_0_diff, vel_init, p_0, c1, c2, vmin, vmax, fre_range, zoom_time)
             break;

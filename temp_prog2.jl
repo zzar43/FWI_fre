@@ -8,8 +8,6 @@ using JLD2, PyPlot;
 vmin = minimum(vel_true);
 vmax = maximum(vel_true);
 
-grad = compute_gradient(vel_init, conf, recorded_data; fre_range=[1], verbose=true);
-@code_warntype compute_gradient(vel_init, conf, recorded_data; fre_range=[1], verbose=true)
-p = -1 * grad / maximum(grad);
+vel_new = steepest_gradient(vel_init, conf, recorded_data, vmin, vmax; alpha_1=100, alpha_max=500, iter_time=5, c1=1e-11, c2=0.9, search_time=5, zoom_time=5, verbose=true, save_graph=true, fre_range="all");
 
-matshow(p'); colorbar()
+vel_new = conjugate_gradient(vel_init, conf, recorded_data, vmin, vmax; alpha_1=100, alpha_max=500, iter_time=5, c1=1e-11, c2=0.9, search_time=5, zoom_time=6, verbose=true, save_graph=true, fre_range="all");
