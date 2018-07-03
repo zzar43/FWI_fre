@@ -3,7 +3,9 @@ function conjugate_gradient(vel_init, conf, recorded_data, vmin, vmax; alpha_1=1
     if fre_range == "all"
         fre_range = 1:1:conf.fre_num
     end
+    # Setup
     iter_main = 0;
+    vel_init = reshape(vel_init,conf.Nx*conf.Ny,1);
 
     for ind_fre in fre_range
 

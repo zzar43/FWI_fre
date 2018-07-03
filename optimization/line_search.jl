@@ -14,7 +14,9 @@ function zoomin(alpha_hi, alpha_lo, phi_lo, phi_0, phi_0_diff, vel_init, p, c1, 
             # println("alpha_hi = alpha_j")
         else
             # phi_j_diff = sum((-1*grad_j./maximum(grad_j)) .* grad_j);
-            phi_j_diff = sum(p .* grad_j);
+            # phi_j_diff = sum(p .* grad_j);
+            phi_j_diff = p.' * grad_j;
+            phi_j_diff = phi_j_diff[1];
             println("phi_j_diff: ", phi_j_diff, " -c2 * phi_0_diff: ", -c2 * phi_0_diff);
             if (abs(phi_j_diff) <= -c2 * phi_0_diff)
                 # println("alpha is: ", alpha_j)
@@ -33,7 +35,8 @@ function zoomin(alpha_hi, alpha_lo, phi_lo, phi_0, phi_0_diff, vel_init, p, c1, 
     end
 
     if alpha == 0
-        println("Zoom fail, alpha = alpha_j: ", alpha);
+        
+        println("Zoom fail, alpha: ", alpha, ", try to increase zoom time.");
     else
         println("Zoom succeed, alpha is: ", alpha)
     end
@@ -41,13 +44,21 @@ function zoomin(alpha_hi, alpha_lo, phi_lo, phi_0, phi_0_diff, vel_init, p, c1, 
 end
 
 function line_search(vel_init, conf, recorded_data, grad_0, p_0, phi_0, alpha_1, alpha_max, fre_range, vmin, vmax; c1 = 1e-11, c2=0.9, search_time=5, zoom_time=5)
-    phi_0_diff = sum(p_0 .* grad_0);
+    # make the size right
+    vel_init = reshape(vel_init,conf.Nx*conf.Ny, 1);
+    grad_0 = reshape(grad_0,conf.Nx*conf.Ny, 1);
+    p_0 = reshape(p_0,conf.Nx*conf.Ny, 1);
+
+    # phi_0_diff = sum(p_0 .* grad_0);
+    phi_0_diff = p_0.' * grad_0;
+    phi_0_diff = phi_0_diff[1];
     println("\nStart line search.\nCheck the coefficients:")
     println("phi_0: ", phi_0, " phi_0 + c1*alpha_1*phi_0_diff: ", phi_0 + c1*alpha_1*phi_0_diff)
 
     iter = 1;
     alpha = 0;
     alpha_0 = 0;
+
     while iter <= search_time
         println("Search time: ", iter, " alpha_1: ", alpha_1)
         vel_1 = update_velocity(vel_init,alpha_1,p_0,vmin,vmax);
@@ -77,7 +88,7 @@ function line_search(vel_init, conf, recorded_data, grad_0, p_0, phi_0, alpha_1,
         end
     end
     if alpha == 0
-        println("Search fail, alpha is: ", alpha)
+        println("Search fail, alpha is alpha_1: ", alpha, ", try to increase zoom time.")
     else
         println("Search succeed, alpha is: ", alpha)
     end

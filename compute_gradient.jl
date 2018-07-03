@@ -10,9 +10,8 @@ function compute_gradient(vel, conf, recorded_data; fre_range="all", verbose::Bo
     omega = 2*pi*conf.frequency;
 
     # Change the shape of vel
-    if size(vel)[2] == 1
-        vel = reshape(vel,conf.Nx,conf.Ny)
-    end
+    vel = reshape(vel,conf.Nx,conf.Ny,1);
+    # end
     if fre_range == "all"
         fre_range = 1:conf.fre_num
     end
@@ -57,6 +56,7 @@ function compute_gradient(vel, conf, recorded_data; fre_range="all", verbose::Bo
     gradient = sum(gradient,2);
     gradient = reshape(gradient,Nx_pml,Ny_pml);
     gradient = gradient[conf.pml_len+1:end-conf.pml_len,conf.pml_len+1:end-conf.pml_len];
+    gradient = reshape(gradient,conf.Nx*conf.Ny,1);
     gradient = Array(gradient);
     return gradient, misfit_diff
 end

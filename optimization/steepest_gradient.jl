@@ -24,6 +24,7 @@ function steepest_gradient(vel_init, conf, recorded_data, vmin, vmax; alpha_1=10
     end
 
     iter_main = 0;
+    vel_init = reshape(vel_init,conf.Nx*conf.Ny,1);
 
     for ind_fre in fre_range
         fre_range1 = [ind_fre];

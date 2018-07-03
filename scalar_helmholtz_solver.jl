@@ -19,9 +19,9 @@ function scalar_helmholtz_solver(vel, conf; fre_range="all", verbose::Bool=false
     Ny_pml = conf.Ny + 2*conf.pml_len;
 
     # Change the shape of vel
-    if size(vel)[2] == 1
-        vel = reshape(vel,conf.Nx,conf.Ny)
-    end
+    # if size(vel)[2] == 1
+    vel = reshape(vel,conf.Nx,conf.Ny);
+    # end
     if fre_range == "all"
         fre_range = 1:conf.fre_num
     end
