@@ -54,7 +54,7 @@ function steepest_gradient(vel_init, conf, recorded_data, vmin, vmax; alpha_1=10
         end
         if save_graph == true
             title_name = conf.frequency[ind_fre];
-            matshow((vel_init)',cmap="PuBu"); colorbar(); title("$title_name Hz");
+            matshow((reshape(vel_init,conf.Nx,conf.Ny))',cmap="PuBu"); colorbar(); title("$title_name Hz")
             savefig("temp_graph/vel_$ind_fre.png");
             println("Velocity graph saved.")
         end

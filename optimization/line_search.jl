@@ -1,5 +1,6 @@
 function zoomin(alpha_hi, alpha_lo, phi_lo, phi_0, phi_0_diff, vel_init, p, c1, c2, vmin, vmax, fre_range, zoom_time)
     alpha = 0;
+    alpha_hi_backup = alpha_hi;
     println("Start zoom.")
 
     for j = 1:zoom_time
@@ -35,7 +36,6 @@ function zoomin(alpha_hi, alpha_lo, phi_lo, phi_0, phi_0_diff, vel_init, p, c1, 
     end
 
     if alpha == 0
-        
         println("Zoom fail, alpha: ", alpha, ", try to increase zoom time.");
     else
         println("Zoom succeed, alpha is: ", alpha)
@@ -52,7 +52,7 @@ function line_search(vel_init, conf, recorded_data, grad_0, p_0, phi_0, alpha_1,
     # phi_0_diff = sum(p_0 .* grad_0);
     phi_0_diff = p_0.' * grad_0;
     phi_0_diff = phi_0_diff[1];
-    println("\nStart line search.\nCheck the coefficients:")
+    println("Start line search. Check the coefficients:")
     println("phi_0: ", phi_0, " phi_0 + c1*alpha_1*phi_0_diff: ", phi_0 + c1*alpha_1*phi_0_diff)
 
     iter = 1;
@@ -88,7 +88,7 @@ function line_search(vel_init, conf, recorded_data, grad_0, p_0, phi_0, alpha_1,
         end
     end
     if alpha == 0
-        println("Search fail, alpha is alpha_1: ", alpha, ", try to increase zoom time.")
+        println("Search fail, alpha is alpha_1: ", alpha, ", try to increase search time.")
     else
         println("Search succeed, alpha is: ", alpha)
     end
@@ -152,8 +152,6 @@ end
 
 function update_velocity(vel,alpha,p,vmin,vmax)
     vel_new = vel + alpha * p;
-    # vel_new[find(x->(x<vmin),vel_new)] = vmin;
-    # vel_new[find(x->(x>vmax),vel_new)] = vmax;
     vel_new[vel_new.<vmin] = vmin;
     vel_new[vel_new.>vmax] = vmax;
     return vel_new

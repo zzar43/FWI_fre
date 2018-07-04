@@ -33,13 +33,14 @@ function conjugate_gradient(vel_init, conf, recorded_data, vmin, vmax; alpha_1=1
         for iter = 1:(iter_time-1)
             iter_main += 1
             if verbose == true
-                println("\nConjugate Gradient Iteration: ", iter_main, " frequency: ", conf.frequency[ind_fre], " Hz at CG step.");
+                print("\nConjugate Gradient Iteration: ", iter_main, " frequency: ", conf.frequency[ind_fre], " Hz at CG step,");
             end
             # Compute gradient
             grad, phi = compute_gradient(vel_init, conf, recorded_data; fre_range=fre_range1);
             # Direction
             p1 = -grad / maximum(grad);
             beta_pr = sum(p1.*(p1-p0)) / sum(p0.*p0);
+            println(" beta_pr: ", beta_pr)
             beta_pr = max(0,beta_pr);
             s1 = p1 + beta_pr * s0;
             # Line search
@@ -58,7 +59,7 @@ function conjugate_gradient(vel_init, conf, recorded_data, vmin, vmax; alpha_1=1
         end
         if save_graph == true
             title_name = conf.frequency[ind_fre];
-            matshow((vel_init)',cmap="PuBu"); colorbar(); title("$title_name Hz")
+            matshow((reshape(vel_init,conf.Nx,conf.Ny))',cmap="PuBu"); colorbar(); title("$title_name Hz")
             savefig("temp_graph/vel_$ind_fre.png");
             println("Velocity graph saved.")
         end

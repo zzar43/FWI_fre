@@ -12,7 +12,7 @@ using JLD2, PyPlot;
 
 # @code_warntype scalar_helmholtz_solver(vel_true, conf; verbose=true)
 
-@save "data_compute/overthrust_small.jld2" wavefield_true recorded_data
+@save "data_compute/overthrust_small.jld2" recorded_data
 
 matshow(real(wavefield_true[:,:,5,20])',cmap="RdBu",clim=[-2,2]); colorbar();
 savefig("temp_graph/wavefield.png")
