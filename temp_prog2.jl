@@ -16,17 +16,7 @@ vmax = maximum(vel_true);
 
 # @save "result_cg.jld2" vel_new
 
-vel_new = l_BFGS(vel_init, conf, recorded_data, vmin, vmax; m=3, alpha_1=10, alpha_max=500, iter_time=10, c1=1e-11, c2=0.9, search_time=7, zoom_time=5, verbose=true, save_graph=true, fre_range="all");
+vel_new = l_BFGS(vel_init, conf, recorded_data, vmin, vmax; m=3, alpha_1=10, alpha_max=500, iter_time=10, c1=1e-11, c2=0.9, search_time=7, zoom_time=7, verbose=true, save_graph=true, fre_range="all");
 
-matshow((reshape(vel_new,conf.Nx,conf.Ny))',cmap="PuBu"); colorbar()
+# matshow((reshape(vel_new,conf.Nx,conf.Ny))',cmap="PuBu"); colorbar()
 @save "result_lbfgs.jld2" vel_new
-
-matshow(vel_true',cmap="PuBu"); colorbar()
-
-A = ones(3,4);
-
-b = ones(3,1)
-
-for i = 1:-1:1
-	print(i)
-end
